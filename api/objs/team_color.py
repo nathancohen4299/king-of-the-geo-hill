@@ -5,8 +5,9 @@ class TeamColor(Enum):
     RED = "RED"
     BLUE = "BLUE"
 
-    def conv(self, label: str):
+    @staticmethod
+    def conv(label: str):
         if label.upper() == "RED":
-            return self.RED
+            return TeamColor.RED
         elif label.upper() == "BLUE":
-            return self.BLUE
+            return TeamColor.BLUE
