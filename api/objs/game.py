@@ -97,7 +97,7 @@ class Game:
 
         difference = len(team1) - len(team2)
         if difference > 0:
-            if difference > len(auto):
+            if difference >= len(auto):
                 team2.extend(auto)
                 return
             equalizer, remainder = auto[:difference], auto[difference:]
@@ -106,7 +106,7 @@ class Game:
         else:
             if difference < 0:
                 difference = -difference
-                if difference > len(auto):
+                if difference >= len(auto):
                     team1.extend(auto)
                     return
             equalizer, remainder = auto[:difference], auto[difference:]
