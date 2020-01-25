@@ -1,14 +1,14 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
 
-
-from objs.game import Game
-from objs.team import Team
-from objs.user import User
+from api.objs.game import Game
+from api.objs.team import Team
+from api.objs.user import User
 
 app = Flask(__name__)
 
 games = {}
+
 
 @app.route("/")
 def index():
@@ -36,7 +36,10 @@ def game_route():
             games[game.name] = game
         return jsonify(game.to_dict())
     elif request.method == "GET":
-        return jsonify("UNIMPLEMENTED")
+        if json["gameName"] in games:
+            return jsonify(games[json["gameName"]].to_dict())
+        else:
+            return jsonify(HTTPStatus.NOT_FOUND)
 
     return "Error"
 
