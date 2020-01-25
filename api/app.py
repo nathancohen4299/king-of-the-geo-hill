@@ -13,16 +13,19 @@ def index():
 @app.route("/user", methods=["POST", "GET"])
 def user_route():
     if request.method == "POST":
-        create_user(request.body)
+        return create_user(request.body)
     elif request.method == "GET":
-        get_user(request.body)
+        return get_user(request.body)
 
 @app.route("/game", method=["POST", "GET"])
 def game_route():
     if request.method == "POST":
-        create_game(request.body)
+        return create_game(request.body)
     elif request.method == "GET":
-        get_game(request.body)
+        return get_game(request.body)
+    
+    return "Error"
+
 
 @app.route("/game/score", method="GET")
 def score_route():
