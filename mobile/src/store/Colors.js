@@ -10,4 +10,5 @@ export class Colors {
     static TRON_RED = '#ed0707'
     static TRON_GREEN = '#008726'
     static TRON_YELLOW = '#D4AF37'
+    static DARK_GRAY = '#222'
 }

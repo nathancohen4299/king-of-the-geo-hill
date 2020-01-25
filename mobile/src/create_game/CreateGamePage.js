@@ -38,11 +38,19 @@ const onCreateGame = async (navigation, gameName, duration) => {
             game_name: gameName,
             duration: parseFloat(duration)
         }),
-        }).then((response) => response.json())
-        .then((responseJson) => {
-            navigation.navigate('Start')
-            // TODO implement this 
-            return;
+        }).then((response) => {
+            if (response.status == 200) {
+                return response.json()
+            }
+            else {
+                return undefined
+            }
+        }).then(responseJson => {
+            if (responseJson !== undefined) { 
+                navigation.navigate('GameSetup', {blueCode: responseJson['blue_team']['code'], redCode: responseJson['red_team']['code'], name: responseJson['name']})
+            } else {
+                // TODO error message
+            }
         })
         .catch((error) => {
         console.error(error);
