@@ -21,26 +21,26 @@ def index():
 def user_route():
     json = request.get_json()
     if request.method == "POST":
-        s = json["teamCode"].split("-")
+        s = json["team_code"].split("-")
         team: TeamColor = TeamColor(s[1])
         game_name: str = s[0]
 
         if game_name not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
-        u = User(json["username"])
+        u = User(json["user_name"])
         games[game_name].add_user(u, team)
 
         ret_dict = {
             "game_name": games[game_name].name,
             "active": games[game_name].active,
             "duration": games[game_name].duration,
-            "team_color": games[game_name].user_names[u.user_name],
+            "team_color": str(games[game_name].user_names[u.user_name]),
         }
 
         return jsonify(ret_dict)
     elif request.method == "GET":
-        user_name = json["username"]
-        game_name = json["gameName"]
+        user_name = json["user_name"]
+        game_name = json["game_name"]
 
         if game_name not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
@@ -48,35 +48,35 @@ def user_route():
         if user_name not in games[game_name].user_names:
             return jsonify(HTTPStatus.NOT_FOUND)
 
-        team: str = games[game_name].user_names[user_name]
+        team_color: TeamColor = games[game_name].user_names[user_name]
 
-        if team == "RED":
+        if team_color == TeamColor.RED:
             return jsonify(games[game_name].red_team.users[user_name].to_dict())
-        elif team == "BLUE":
+        elif team_color == TeamColor.BLUE:
             return jsonify(games[game_name].blue_team.users[user_name].to_dict())
 
         return jsonify(HTTPStatus.BAD_REQUEST)
 
-    return "Error"
+    return jsonify(HTTPStatus.BAD_REQUEST)
 
 
 @app.route("/game", methods=["POST", "GET"])
 def game_route():
     json = request.get_json()
     if request.method == "POST":
-        game = Game(json["gameName"], json["duration"])
+        game = Game(json["game_name"], json["duration"])
         if game.name in games:
             return jsonify(HTTPStatus.CONFLICT)
         else:
             games[game.name] = game
         return jsonify(game.to_dict())
     elif request.method == "GET":
-        if json["gameName"] in games:
-            return jsonify(games[json["gameName"]].to_dict())
+        if json["game_name"] in games:
+            return jsonify(games[json["game_name"]].to_dict())
         else:
             return jsonify(HTTPStatus.NOT_FOUND)
 
-    return "Error"
+    return jsonify(HTTPStatus.BAD_REQUEST)
 
 
 @app.route("/game/score", methods=["GET"])

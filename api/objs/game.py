@@ -20,7 +20,7 @@ class Game:
         self.blue_team: Team = Team(self.name + "-BLUE")
         self.red_team: Team = Team(self.name + "-RED")
         self.active: bool = False
-        self.user_names: Dict[str, str] = {}
+        self.user_names: Dict[str, TeamColor] = {}
 
     def start_game(self):
         self.active = True
@@ -29,7 +29,7 @@ class Game:
         self.active = False
 
     def add_user(self, u: User, team: TeamColor):
-        self.user_names[u.user_name] = str(team)
+        self.user_names[u.user_name] = team
         if team == TeamColor.RED:
             self.red_team.add_user(u)
         elif team == TeamColor.BLUE:
