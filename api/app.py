@@ -17,6 +17,8 @@ def user_route():
     elif request.method == "GET":
         return get_user(request.body)
 
+    return "Error"
+
 @app.route("/game", method=["POST", "GET"])
 def game_route():
     if request.method == "POST":
