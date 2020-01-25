@@ -12,14 +12,34 @@ games = {}
 
 @app.route("/")
 def index():
-    return jsonify(200)
+    return jsonify(HTTPStatus.OK)
 
 
 @app.route("/user", methods=["POST", "GET"])
 def user_route():
+    json = request.get_json()
     if request.method == "POST":
-        return jsonify("UNIMPLEMENTED")
+        s = json["teamCode"].split("-")
+        team = "blue_team" if s[1] == "BLUE" else "red_team"
+        game_name = s[0]
+        if game_name not in games:
+            return jsonify(HTTPStatus.NOT_FOUND)
+        current_game = games[game_name]
+        current_game[team].add_user(User(json["name"]))
+
+        ret_dict = {
+            "name": current_game.name,
+            "active": current_game.active,
+            "duration": current_game.duration
+        }
+
+        return jsonify(ret_dict)
     elif request.method == "GET":
+        # if json["gameName"] not in games:
+        #     return jsonify(HTTPStatus.NOT_FOUND)
+        #
+        # if json["username"] not in []games[json["gameName"]]:
+        #     return jsonify(HTTPStatus.NOT_FOUND)
         return jsonify("UNIMPLEMENTED")
 
     return "Error"
