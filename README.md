@@ -1,4 +1,4 @@
-# poppin
+# King of the Geo Hill
 Project for Boilermake 2020
 
 ## Authors
