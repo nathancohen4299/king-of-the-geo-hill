@@ -79,6 +79,30 @@ def game_route():
     return jsonify(HTTPStatus.BAD_REQUEST)
 
 
+@app.route("/team/<game_id>", methods=["GET"])
+def team_route(game_id: str):
+    if request.method == "GET":
+        if game_id in games:
+            return_dict = {"blue_team": games[game_id].blue_team.to_dict(),
+                           "red_team": games[game_id].red_team.to_dict()}
+            return jsonify(return_dict)
+
+    return jsonify(HTTPStatus.NOT_FOUND)
+
+
+@app.route("/team/<game_id>/<team_color>", methods=["GET"])
+def team_route(game_id: str, team_color: str):
+    if request.method == "GET":
+        if game_id in games:
+            team = TeamColor(team_color.upper())
+            if team == TeamColor.RED:
+                return jsonify(games[game_id].red_team.to_dict())
+            elif team == TeamColor.BLUE:
+                return jsonify(games[game_id].blue_team.to_dict())
+
+    return jsonify(HTTPStatus.NOT_FOUND)
+
+
 @app.route("/game/score", methods=["GET"])
 def score_route():
     return jsonify("UNIMPLEMENTED")
