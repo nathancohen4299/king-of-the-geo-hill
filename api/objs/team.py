@@ -1,5 +1,5 @@
 from typing import List
-from api.objs.user import User
+from .user import User
 
 
 class Team:

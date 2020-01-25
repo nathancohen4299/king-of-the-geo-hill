@@ -1,15 +1,14 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
 
-from api.objs.game import Game
-from api.objs.team import Team
-from api.objs.user import User
+
+from objs.game import Game
+from objs.team import Team
+from objs.user import User
 
 app = Flask(__name__)
 
 games = {}
-
-UNIMPLEMENTED = jsonify("UNIMPLEMENTED")
 
 @app.route("/")
 def index():
@@ -19,9 +18,9 @@ def index():
 @app.route("/user", methods=["POST", "GET"])
 def user_route():
     if request.method == "POST":
-        return UNIMPLEMENTED
+        return jsonify("UNIMPLEMENTED")
     elif request.method == "GET":
-        return UNIMPLEMENTED
+        return jsonify("UNIMPLEMENTED")
 
     return "Error"
 
@@ -37,14 +36,14 @@ def game_route():
             games[game.name] = game
         return jsonify(game.to_dict())
     elif request.method == "GET":
-        return UNIMPLEMENTED
+        return jsonify("UNIMPLEMENTED")
 
     return "Error"
 
 
 @app.route("/game/score", methods=["GET"])
 def score_route():
-    return UNIMPLEMENTED
+    return jsonify("UNIMPLEMENTED")
 
 
 if __name__ == "__main__":

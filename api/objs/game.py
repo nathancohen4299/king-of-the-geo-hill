@@ -1,5 +1,5 @@
 from typing import List
-from api.objs.team import Team
+from .team import Team
 
 
 class Game:
