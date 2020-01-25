@@ -130,10 +130,37 @@ def team_count_spec(game_id: str, team_color: str):
 
     abort(HTTPStatus.NOT_FOUND)
 
+number = 0
 
 @app.route("/game/score", methods=["GET"])
 def score_route():
     return jsonify("UNIMPLEMENTED")
+
+@app.route("/webhook", methods=["POST", "GET"])
+def webhook():
+    global team_count
+    event = request.get_json()["event"]
+    user = event["user"]["userId"]
+    game_id = event["metadata"]["game_id"]
+    
+    if event["type"] == "user.entered_geofence":
+        if game[game_id].user_names[user] == TeamColor.RED:
+            team_count["red"] = team_count["red"] + 1
+        elif game[game_id].user_names[user] == TeamColor.BLUE:
+            team_count["blue"] = team_count["blue"] + 1
+    elif event["type"] == "user.exited_geofence":
+        if game[game_id].user_names[user] == TeamColor.RED:
+            team_count["red"] = team_count["red"] - 1
+        elif game[game_id].user_names[user] == TeamColor.BLUE:
+            team_count["blue"] = team_count["blue"] - 1
+
+
+    return jsonify(success=True)
+
+@app.route("/score", methods=["GET"])
+def score():
+    global number
+    return jsonify(number)
 
 
 if __name__ == "__main__":
