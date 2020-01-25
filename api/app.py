@@ -97,7 +97,7 @@ def team_count(game_id: str):
     if request.method == "GET":
         if game_id in games:
             return_dict = {"blue_team_count": len(games[game_id].blue_team.users),
-                           "red_team_count": len(games[game_id].blue_team.users)}
+                           "red_team_count": len(games[game_id].red_team.users)}
             return jsonify(return_dict)
 
     abort(HTTPStatus.NOT_FOUND)
@@ -112,6 +112,21 @@ def team_route(game_id: str, team_color: str):
                 return jsonify(games[game_id].red_team.to_dict())
             elif team == TeamColor.BLUE:
                 return jsonify(games[game_id].blue_team.to_dict())
+
+    abort(HTTPStatus.NOT_FOUND
+
+
+@app.route("/team/<game_id>/<team_color>/count", methods=["GET"])
+def team_count_spec(game_id: str, team_color: str):
+    if request.method == "GET":
+        if game_id in games:
+            team = TeamColor(team_color.upper())
+            if team == TeamColor.RED:
+                return {"count": len(games[game_id].red_team.users)}
+            elif team == TeamColor.blue:
+                return {"count": len(games[game_id].blue_team.users)}
+
+            abort(HTTPStatus.NOT_FOUND, "Team Not Found")
 
     abort(HTTPStatus.NOT_FOUND)
 
