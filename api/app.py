@@ -1,13 +1,15 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
+from typing import Dict
 
 from api.objs.game import Game
 from api.objs.team import Team
+from api.objs.team_color import TeamColor
 from api.objs.user import User
 
 app = Flask(__name__)
 
-games = {}
+games: Dict[str, Game] = {}
 
 
 @app.route("/")
@@ -20,27 +22,38 @@ def user_route():
     json = request.get_json()
     if request.method == "POST":
         s = json["teamCode"].split("-")
-        team = "blue_team" if s[1] == "BLUE" else "red_team"
+        team = TeamColor.conv(s[1])
         game_name = s[0]
         if game_name not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
-        current_game = games[game_name]
-        current_game[team].add_user(User(json["name"]))
+        u = User(json["username"])
+        games[game_name].add_user(u, team)
 
         ret_dict = {
-            "name": current_game.name,
-            "active": current_game.active,
-            "duration": current_game.duration
+            "name": games[game_name].name,
+            "active": games[game_name].active,
+            "duration": games[game_name].duration
         }
 
         return jsonify(ret_dict)
     elif request.method == "GET":
-        # if json["gameName"] not in games:
-        #     return jsonify(HTTPStatus.NOT_FOUND)
-        #
-        # if json["username"] not in []games[json["gameName"]]:
-        #     return jsonify(HTTPStatus.NOT_FOUND)
-        return jsonify("UNIMPLEMENTED")
+        user_name = json["username"]
+        game_name = json["gameName"]
+
+        if game_name not in games:
+            return jsonify(HTTPStatus.NOT_FOUND)
+
+        if user_name not in games[game_name].user_names:
+            return jsonify(HTTPStatus.NOT_FOUND)
+
+        team: str = games[game_name].user_names[user_name]
+
+        if team == "RED":
+            return jsonify(games[game_name].red_team[user_name])
+        elif team == "BLUE":
+            return jsonify(games[game_name].blue_team[user_name])
+
+        return jsonify(HTTPStatus.BAD_REQUEST)
 
     return "Error"
 
