@@ -85,19 +85,20 @@ class Game:
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
 
         def split_and_add_list_evenly(list1: List[Any], list2: List[Any], list3: List[Any]):
-            fh, sh = list3[:(len(list3) // 2)][(len(list3) // 2):]
+            fh, sh = list3[:(len(list3) // 2)], list3[(len(list3) // 2):]
             list1.extend(fh)
             list2.extend(sh)
 
         for i in range(0, 2):
             random.shuffle(auto)
+
         if len(team1) == len(team2):
             split_and_add_list_evenly(team1, team2, auto)
 
         difference = len(team1) - len(team2)
         if difference > 0:
             if difference > len(auto):
-                team1.extend(auto)
+                team2.extend(auto)
                 return
             equalizer, remainder = auto[:difference], auto[difference:]
             team1.extend(equalizer)
@@ -106,7 +107,7 @@ class Game:
             if difference < 0:
                 difference = -difference
                 if difference > len(auto):
-                    team2.extend(auto)
+                    team1.extend(auto)
                     return
             equalizer, remainder = auto[:difference], auto[difference:]
             team2.extend(equalizer)
