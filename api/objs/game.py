@@ -1,9 +1,10 @@
 from enum import Enum
 
 from typing import Dict, List
+
+from .team_color import TeamColor
 from .team import Team
 from .user import User
-from ..app import TeamColor
 
 
 class Status(Enum):
