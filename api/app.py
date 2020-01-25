@@ -2,14 +2,36 @@ from flask import Flask, jsonify
 import requests
 from google.cloud import firestore
 
-import utils.auth as auth
-
+from utils.auth import authenticate
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
     return jsonify(200)
+
+@app.route("/user", methods=["POST", "GET"])
+def user_route():
+    if request.method == "POST":
+        return create_user(request.body)
+    elif request.method == "GET":
+        return get_user(request.body)
+
+    return "Error"
+
+@app.route("/game", method=["POST", "GET"])
+def game_route():
+    if request.method == "POST":
+        return create_game(request.body)
+    elif request.method == "GET":
+        return get_game(request.body)
+    
+    return "Error"
+
+
+@app.route("/game/score", method="GET")
+def score_route():
+    return jsonify(get_score)
 
 if __name__=="__main__":
     app.run()
