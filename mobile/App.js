@@ -6,21 +6,23 @@
  * @flow
  */
 
-import React from 'react';
-import {
-  View,
-} from 'react-native';
-import { LargeButton } from './components/LargeButton';
+import { StartPage } from './src/start/StartPage';
+import {createAppContainer} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
+import { CreateGamePage } from './src/create_game/CreateGamePage';
+import { JoinGamePage } from './src/join_game/JoinGamePage';
 
-const App = () => {
-  return (
-    <>
-      <View style={[{height: '35%'}]} />
-      <LargeButton text='Create Game' color='#2277DD'/>
-      <View style={[{height: '2.5%'}]} />
-      <LargeButton text='Join Game' color='#339933'/>
-    </>
-  );
-};
+const MainNavigator = createStackNavigator({
+  Start: {screen: StartPage},
+  CreateGame: {screen: CreateGamePage},
+  JoinGame: {screen: JoinGamePage}
+}, {
+  headerMode: 'none',
+  navigationOptions: {
+    headerVisible: false,
+}
+});
+
+const App = createAppContainer(MainNavigator);
 
 export default App;
