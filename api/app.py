@@ -49,9 +49,9 @@ def user_route():
         team: str = games[game_name].user_names[user_name]
 
         if team == "RED":
-            return jsonify(games[game_name].red_team[user_name])
+            return jsonify(games[game_name].red_team.users[user_name])
         elif team == "BLUE":
-            return jsonify(games[game_name].blue_team[user_name])
+            return jsonify(games[game_name].blue_team.users[user_name])
 
         return jsonify(HTTPStatus.BAD_REQUEST)
 
