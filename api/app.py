@@ -92,7 +92,7 @@ def teams_route(game_id: str):
     abort(HTTPStatus.NOT_FOUND)
 
 
-@app.route("/team/count", methods=["GET"])
+@app.route("/team/<game_id>/count", methods=["GET"])
 def team_count(game_id: str):
     if request.method == "GET":
         if game_id in games:
