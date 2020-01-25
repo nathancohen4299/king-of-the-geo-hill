@@ -21,22 +21,18 @@ def index():
 def user_route():
     json = request.get_json()
     if request.method == "POST":
-        s = json["team_code"].split("-")
-        team: TeamColor = TeamColor(s[1].upper())
-        game_id: str = s[0]
+        game_id: str = json["game_code"]
 
         if game_id not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
-        u = User(json["user_name"])
 
-        if not games[game_id].add_user(u, team):
+        if not games[game_id].add_user(json["user_name"], TeamColor.AUTO):
             abort(HTTPStatus.CONFLICT)
 
         ret_dict = {
             "game_id": games[game_id].id,
             "status": games[game_id].status.name,
             "duration": games[game_id].duration,
-            "team_color": games[game_id].user_names[u.user_name].name,
         }
 
         return jsonify(ret_dict)
@@ -50,14 +46,27 @@ def user_route():
         if user_name not in games[game_id].user_names:
             abort(HTTPStatus.NOT_FOUND, "User")
 
-        team_color: TeamColor = games[game_id].user_names[user_name]
+        return jsonify(games[game_id].user_names[user_name].value)
+    elif request.method == "PUT":
+        user_name = json["user_name"]
+        game_id = json["game_id"]
+        team_color_str = json["team_color"]
 
-        if team_color == TeamColor.RED:
-            return jsonify(games[game_id].red_team.users[user_name].to_dict())
-        elif team_color == TeamColor.BLUE:
-            return jsonify(games[game_id].blue_team.users[user_name].to_dict())
+        #try:
+        team = TeamColor(team_color_str)
+       # except:
+        #   abort(HTTPStatus.NOT_FOUND, "team does not exist")
+        if game_id not in games:
+            abort(HTTPStatus.NOT_FOUND, "Game ID")
 
-        abort(HTTPStatus.BAD_REQUEST)
+        if user_name not in games[game_id].user_names:
+            abort(HTTPStatus.NOT_FOUND, "User")
+
+        games[game_id].set_user(user_name, team)
+
+
+
+
 
     abort(HTTPStatus.BAD_REQUEST)
 
