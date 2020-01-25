@@ -15,10 +15,10 @@ class Status(Enum):
 
 class Game:
     def __init__(self, name: str, duration: float):
-        self.name: str = name
+        self.id: str = name
         self.duration: float = duration
-        self.blue_team: Team = Team(self.name + "-BLUE")
-        self.red_team: Team = Team(self.name + "-RED")
+        self.blue_team: Team = Team(self.id + "-BLUE")
+        self.red_team: Team = Team(self.id + "-RED")
         self.active: bool = False
         self.user_names: Dict[str, TeamColor] = {}
 
@@ -29,15 +29,20 @@ class Game:
         self.active = False
 
     def add_user(self, u: User, team: TeamColor):
+        if u.user_name in self.user_names:
+            return False
+
         self.user_names[u.user_name] = team
         if team == TeamColor.RED:
             self.red_team.add_user(u)
         elif team == TeamColor.BLUE:
             self.blue_team.add_user(u)
 
+        return True
+
     def to_dict(self):
         return {
-            "name": self.name,
+            "id": self.id,
             "duration": self.duration,
             "red_team": self.red_team.to_dict(),
             "blue_team": self.blue_team.to_dict(),
