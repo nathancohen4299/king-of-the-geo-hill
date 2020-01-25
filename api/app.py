@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 import requests
-from google.cloud import firestore
 
 from utils.auth import authenticate
 
