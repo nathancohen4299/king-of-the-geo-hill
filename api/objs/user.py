@@ -3,4 +3,4 @@ class User:
         self.user_name: str = user_name
 
     def to_dict(self):
-        return {"userName": self.user_name}
+        return {"user_name": self.user_name}
