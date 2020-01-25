@@ -3,9 +3,11 @@ import requests
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def index():
     return jsonify(200)
+
 
 @app.route("/user", methods=["POST", "GET"])
 def user_route():
@@ -16,13 +18,14 @@ def user_route():
 
     return "Error"
 
+
 @app.route("/game", methods=["POST", "GET"])
 def game_route():
     if request.method == "POST":
         return create_game(request.body)
     elif request.method == "GET":
         return get_game(request.body)
-    
+
     return "Error"
 
 
@@ -30,5 +33,6 @@ def game_route():
 def score_route():
     return jsonify(get_score)
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     app.run()
