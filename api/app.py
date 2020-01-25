@@ -1,8 +1,6 @@
 from flask import Flask, jsonify
 import requests
 
-from utils.auth import authenticate
-
 app = Flask(__name__)
 
 @app.route("/")
@@ -18,7 +16,7 @@ def user_route():
 
     return "Error"
 
-@app.route("/game", method=["POST", "GET"])
+@app.route("/game", methods=["POST", "GET"])
 def game_route():
     if request.method == "POST":
         return create_game(request.body)
@@ -28,7 +26,7 @@ def game_route():
     return "Error"
 
 
-@app.route("/game/score", method="GET")
+@app.route("/game/score", methods=["GET"])
 def score_route():
     return jsonify(get_score)
 
