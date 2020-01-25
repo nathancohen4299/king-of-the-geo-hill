@@ -47,7 +47,7 @@ const onCreateGame = async (navigation, gameName, duration) => {
             }
         }).then(responseJson => {
             if (responseJson !== undefined) { 
-                navigation.navigate('GameSetup', {blueCode: responseJson['blue_team']['code'], redCode: responseJson['red_team']['code'], name: responseJson['name']})
+                navigation.navigate('GameSetup', {code: responseJson['code'], name: responseJson['name'], isOwner: true})
             } else {
                 // TODO error message
             }
