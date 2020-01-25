@@ -92,6 +92,17 @@ def teams_route(game_id: str):
     abort(HTTPStatus.NOT_FOUND)
 
 
+@app.route("/team/count", methods=["GET"])
+def team_count(game_id: str):
+    if request.method == "GET":
+        if game_id in games:
+            return_dict = {"blue_team_count": len(games[game_id].blue_team.users),
+                           "red_team_count": len(games[game_id].blue_team.users)}
+            return jsonify(return_dict)
+
+    abort(HTTPStatus.NOT_FOUND)
+
+
 @app.route("/team/<game_id>/<team_color>", methods=["GET"])
 def team_route(game_id: str, team_color: str):
     if request.method == "GET":
