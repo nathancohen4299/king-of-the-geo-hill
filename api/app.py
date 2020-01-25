@@ -113,7 +113,7 @@ def team_route(game_id: str, team_color: str):
             elif team == TeamColor.BLUE:
                 return jsonify(games[game_id].blue_team.to_dict())
 
-    abort(HTTPStatus.NOT_FOUND
+    abort(HTTPStatus.NOT_FOUND)
 
 
 @app.route("/team/<game_id>/<team_color>/count", methods=["GET"])
@@ -126,7 +126,7 @@ def team_count_spec(game_id: str, team_color: str):
             elif team == TeamColor.blue:
                 return {"count": len(games[game_id].blue_team.users)}
 
-            abort(HTTPStatus.NOT_FOUND, "Team Not Found")
+            abort(HTTPStatus.NOT_FOUND, "Team Not Founda")
 
     abort(HTTPStatus.NOT_FOUND)
 
