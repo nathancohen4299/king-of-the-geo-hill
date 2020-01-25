@@ -28,13 +28,17 @@ class Game:
     def end_game(self):
         self.active = False
 
-    def add_user(self, u: User, team: str):
-        self.user_names[u.user_name] = team
+    def add_user(self, u: User, team: TeamColor):
+        self.user_names[u.user_name] = str(team)
         if team == TeamColor.RED:
             self.red_team.add_user(u)
         elif team == TeamColor.BLUE:
             self.blue_team.add_user(u)
 
     def to_dict(self):
-        return {"name": self.name, "duration": self.duration, "red_team": self.red_team.to_dict(),
-                "blue_team": self.blue_team.to_dict()}
+        return {
+            "name": self.name,
+            "duration": self.duration,
+            "red_team": self.red_team.to_dict(),
+            "blue_team": self.blue_team.to_dict(),
+        }

@@ -22,17 +22,19 @@ def user_route():
     json = request.get_json()
     if request.method == "POST":
         s = json["teamCode"].split("-")
-        team = TeamColor.conv(s[1])
-        game_name = s[0]
+        team: TeamColor = TeamColor(s[1])
+        game_name: str = s[0]
+
         if game_name not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
         u = User(json["username"])
         games[game_name].add_user(u, team)
 
         ret_dict = {
-            "name": games[game_name].name,
+            "game_name": games[game_name].name,
             "active": games[game_name].active,
-            "duration": games[game_name].duration
+            "duration": games[game_name].duration,
+            "team_color": games[game_name].user_names[u.user_name],
         }
 
         return jsonify(ret_dict)
@@ -49,9 +51,9 @@ def user_route():
         team: str = games[game_name].user_names[user_name]
 
         if team == "RED":
-            return jsonify(games[game_name].red_team.users[user_name])
+            return jsonify(games[game_name].red_team.users[user_name].to_dict())
         elif team == "BLUE":
-            return jsonify(games[game_name].blue_team.users[user_name])
+            return jsonify(games[game_name].blue_team.users[user_name].to_dict())
 
         return jsonify(HTTPStatus.BAD_REQUEST)
 

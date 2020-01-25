@@ -9,7 +9,11 @@ class Team:
         self.users: List[User] = []
 
     def to_dict(self):
-        return {"code": self.code, "score": self.score, "users": [u.to_dict() for u in self.users]}
+        return {
+            "code": self.code,
+            "score": self.score,
+            "users": [u.to_dict() for u in self.users],
+        }
 
     def add_user(self, u: User):
         self.users.append(u)
