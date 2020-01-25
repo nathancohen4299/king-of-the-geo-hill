@@ -80,7 +80,7 @@ def game_route():
 
 
 @app.route("/team/<game_id>", methods=["GET"])
-def team_route(game_id: str):
+def teams_route(game_id: str):
     if request.method == "GET":
         if game_id in games:
             return_dict = {"blue_team": games[game_id].blue_team.to_dict(),
