@@ -34,9 +34,9 @@ def user_route():
 
         ret_dict = {
             "game_id": games[game_id].id,
-            "active": games[game_id].active,
+            "status": games[game_id].status.name,
             "duration": games[game_id].duration,
-            "team_color": str(games[game_id].user_names[u.user_name]),
+            "team_color": games[game_id].user_names[u.user_name].name,
         }
 
         return jsonify(ret_dict)
@@ -66,15 +66,15 @@ def user_route():
 def game_route():
     json = request.get_json()
     if request.method == "POST":
-        game = Game(json["game_name"], json["duration"])
+        game = Game(json["game_id"], json["duration"])
         if game.id in games:
             return jsonify(HTTPStatus.CONFLICT)
         else:
             games[game.id] = game
         return jsonify(game.to_dict())
     elif request.method == "GET":
-        if json["game_name"] in games:
-            return jsonify(games[json["game_name"]].to_dict())
+        if json["game_id"] in games:
+            return jsonify(games[json["game_id"]].to_dict())
         else:
             abort(HTTPStatus.NOT_FOUND)
 
