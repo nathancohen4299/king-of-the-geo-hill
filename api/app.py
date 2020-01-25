@@ -17,11 +17,11 @@ def index():
     return jsonify(HTTPStatus.OK)
 
 
-@app.route("/user", methods=["POST", "GET"])
+@app.route("/user", methods=["POST", "GET", "PUT"])
 def user_route():
     json = request.get_json()
     if request.method == "POST":
-        game_id: str = json["game_code"]
+        game_id: str = json["game_id"]
 
         if game_id not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
@@ -50,7 +50,7 @@ def user_route():
     elif request.method == "PUT":
         user_name = json["user_name"]
         game_id = json["game_id"]
-        team_color_str = json["team_color"]
+        team_color_str = json["team_color"].upper()
 
         #try:
         team = TeamColor(team_color_str)
@@ -64,10 +64,6 @@ def user_route():
 
         games[game_id].set_user(user_name, team)
 
-
-
-
-
     abort(HTTPStatus.BAD_REQUEST)
 
 
@@ -77,7 +73,7 @@ def game_route():
     if request.method == "POST":
         game = Game(json["game_id"], json["duration"])
         if game.id in games:
-            return jsonify(HTTPStatus.CONFLICT)
+            abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")
         else:
             games[game.id] = game
         return jsonify(game.to_dict())

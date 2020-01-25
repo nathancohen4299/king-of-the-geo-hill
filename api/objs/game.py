@@ -24,16 +24,35 @@ class Game:
         self.potential_auto_assign_count: int = 0
         self.blue_team: Team = Team()
         self.red_team: Team = Team()
-        self.status: Status = Status(1)
+        self.status: Status = Status.START
         self.user_names: Dict[str, TeamColor] = {}
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "duration": self.duration,
+            "red_team_count": self.potential_red_team_count,
+            "blue_team_count": self.potential_blue_team_count,
+            "auto_count": self.potential_auto_assign_count,
+            "status": str(self.status.name)
+        }
     def start_game(self):
         # initialize teams here
+        red_team, blue_team, auto_assign = [], [], []
+        for user_name, team in self.user_names.items():
+            if team == TeamColor.RED:
+                red_team.append(user_name)
+            elif team == TeamColor.BLUE:
+                blue_team.append(user_name)
+            else:
+                auto_assign.append(user_name)
 
-        self.status = Status(2)
+        Game.balance_teams(red_team, blue_team, auto_assign)
+
+        self.status = Status.ACTIVE
 
     def end_game(self):
-        self.status = Status(3)
+        self.status = Status.FINISH
 
     def add_user(self, user_name: str, team: TeamColor):
         u = User(user_name)
@@ -72,14 +91,7 @@ class Game:
         elif new_team == TeamColor.AUTO:
             self.potential_auto_assign_count += 1
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "duration": self.duration,
-            "red_team": self.red_team.to_dict(),
-            "blue_team": self.blue_team.to_dict(),
-            "status": str(self.status.name)
-        }
+
 
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
