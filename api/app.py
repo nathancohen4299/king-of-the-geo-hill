@@ -3,6 +3,8 @@ import requests
 
 app = Flask(__name__)
 
+radar_secret = "prj_test_sk_593c83bc7be1078df3fd09f125eb776f96906dee"
+radar_publishable = "prj_test_pk_0889e881e212db85de58eb26ba51acfec369c037"
 
 @app.route("/")
 def index():
