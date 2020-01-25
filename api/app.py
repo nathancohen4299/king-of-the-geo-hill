@@ -22,7 +22,7 @@ def user_route():
     json = request.get_json()
     if request.method == "POST":
         s = json["team_code"].split("-")
-        team: TeamColor = TeamColor(s[1])
+        team: TeamColor = TeamColor(s[1].upper())
         game_id: str = s[0]
 
         if game_id not in games:
