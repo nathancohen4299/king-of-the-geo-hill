@@ -51,6 +51,12 @@ class Game:
         Game.balance_teams(red_team, blue_team, auto_assign)
         self.potential_blue_team_count = len(self.blue_team.users)
         self.potential_red_team_count = len(self.red_team.users)
+
+        # Add user to sets
+        for username in red_team:
+            self.red_team.users[username] = User(username)
+        for username in blue_team:
+            self.blue_team.users[username] = User(username)
         self.status = Status.ACTIVE
 
     def end_game(self):
