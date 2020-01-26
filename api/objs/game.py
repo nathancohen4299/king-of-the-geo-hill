@@ -92,6 +92,8 @@ class Game:
         elif new_team == TeamColor.AUTO:
             self.potential_auto_assign_count += 1
 
+        return True
+
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
 

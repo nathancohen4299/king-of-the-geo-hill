@@ -59,7 +59,10 @@ def user_route(game_id: str, user_id: str):
         if user_id not in games[game_id].user_names:
             abort(HTTPStatus.NOT_FOUND, "User")
 
-        games[game_id].set_user(user_id, team)
+        if not games[game_id].set_user(user_id, team):
+            abort(HTTPStatus.CONFLICT, "Something went wrong")
+
+        return jsonify("OK")
 
     abort(HTTPStatus.BAD_REQUEST)
 
