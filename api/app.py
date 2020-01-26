@@ -20,7 +20,7 @@ def get_users_in_geofence():
     )
     app.logger.critical(r.text)
     app.logger.critical(r.json()["users"])
-    # update_score(r.json()["users"])
+    update_score(r.json()["users"])
 
 
 # class Config(object):
