@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, abort
 from http import HTTPStatus
 from typing import Dict
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from api.objs.game import Game
 from api.objs.team import Team
 from api.objs.team_color import TeamColor
@@ -11,6 +13,32 @@ app = Flask(__name__)
 
 games: Dict[str, Game] = {}
 
+class Config(object):
+    JOBS = [
+        {
+            'id': 'interval_update',
+            'func': 'app:interval_update',
+            'args': (1, 2),
+            'trigger': 'interval',
+            'seconds': 1
+        }
+    ]
+
+    SCHEDULER_API_ENABLED = True
+
+def interval_update():
+    print("deeeeeAAAAAR JOOOOOOOOHNNN")
+
+
+@app.before_first_request
+def timer_start():
+    app.config.from_object(Config())
+
+    scheduler = APScheduler()
+    # it is also possible to enable the API directly
+    # scheduler.api_enabled = True
+    scheduler.init_app(app)
+    scheduler.start()
 
 @app.route("/")
 def index():
