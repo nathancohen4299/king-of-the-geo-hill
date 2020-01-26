@@ -3,6 +3,8 @@ import os
 from http import HTTPStatus
 from typing import Dict, List, Any
 
+from shapely.geometry import Polygon, Point
+
 import requests
 from flask import Flask, jsonify, request, abort
 from flask_apscheduler import APScheduler
@@ -19,14 +21,14 @@ geofence_id = "5e2d585adb7df6004d1cb8b9"
 def get_users_in_geofence():
     headers = {"Authorization": os.getenv("radar_private_key")}
     r = requests.get(
-        "https://api.radar.io/v1/geofences/{}/users".format(geofence_id),
+        "https://api.radar.io/v1/geofences/{}".format(geofence_id),
         headers=headers,
     )
     print(r.text)
     app.logger.info(r.text)
     app.logger.info(os.getenv("KEY"))
-    app.logger.critical(r.json()["users"])
-    update_score(r.json()["users"])
+    app.logger.critical(r.json())
+    update_score(r.json())
 
 
 scheduler = APScheduler()
@@ -43,19 +45,32 @@ app.logger.setLevel(gunicorn_logger.level)
 games: Dict[str, Game] = {}
 
 
-def update_score(users_in_geofence: List[Dict[str, Any]]):
+def update_score(geofence_information):
     # log users here
+
+    polygon_coordinates = [ (c[0], c[1]) for c in geofence_information["geometry"]["coordinates"] ]
+    zone = Polygon(polygon_coordinates)
+
+    
+
+    for game in games.keys():
+        g = games[game]
+        for username in g.usernames.keys():
+            if g.usernames[useranme] == TeamColors.RED:
+                # check red
+                lat, long = g.red_team.users[username].get_coords()
+                p = Point(lat, long)
+                if zone.contains(p):
+                    games[game_id].red_team.in_geofence_count += 1
+            elif g.usernames[user] == TeamColors.BLUE:
+                # check blue
+                lat, long = g.blue_team.users[username].get_coords()
+                p = Point(lat, long)
+
 
     for user in users_in_geofence:
         user_id = user["userId"]
 
-        headers = {"Authorization": os.getenv("radar_private_key")}
-
-        a = "https://api.radar.io/v1/users/{}".format(user_id)
-        app.logger.info(a)
-        r = requests.get(a, headers=headers)
-        j = r.json()
-        app.logger.critical(j)
         game_id = j["user"]["metadata"]["game_id"]
         if game_id in games:
             if user_id in games[game_id].usernames:
