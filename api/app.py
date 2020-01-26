@@ -13,13 +13,16 @@ from api.objs.team_color import TeamColor
 
 app = Flask(__name__)
 
+geofence_id = "5e2d585adb7df6004d1cb8b9"
+
 
 def get_users_in_geofence():
     headers = {"Authorization": os.getenv("radar_private_key")}
     r = requests.get(
-        "https://api.radar.io/v1/geofences/5e2d585adb7df6004d1cb8b9/users",
+        "https://api.radar.io/v1/geofences/{}/users".format(geofence_id),
         headers=headers,
     )
+    print(r.text)
     app.logger.info(r.text)
     app.logger.info(os.getenv("KEY"))
     app.logger.critical(r.json()["users"])
@@ -45,8 +48,6 @@ def update_score(users_in_geofence: List[Dict[str, Any]]):
 
     for user in users_in_geofence:
         user_id = user["userId"]
-       
-
 
         headers = {"Authorization": os.getenv("radar_private_key")}
 
