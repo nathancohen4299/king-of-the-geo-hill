@@ -1,18 +1,12 @@
-from enum import Enum
-
 from typing import Any, Dict, List
 
 from .team_color import TeamColor
 from .team import Team
 from .user import User
-
+from .status import Status
 import random
 
 
-class Status(Enum):
-    START = 1
-    ACTIVE = 2
-    FINISH = 3
 
 
 class Game:
@@ -38,7 +32,7 @@ class Game:
             "blue_team_count": self.potential_blue_team_count,
             "auto_count": self.potential_auto_assign_count,
             "status": str(self.status.name),
-            "control": self.last_in_control
+            "control": str(self.last_in_control)
         }
 
     def start_game(self):

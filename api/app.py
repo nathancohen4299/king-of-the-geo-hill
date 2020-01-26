@@ -5,7 +5,8 @@ import requests
 from flask_apscheduler import APScheduler
 from flask import Flask, jsonify, request, abort
 
-from api.objs.game import Game, Status
+from api.objs.game import Game
+from api.objs.status import Status
 from api.objs.team_color import TeamColor
 
 app = Flask(__name__)
