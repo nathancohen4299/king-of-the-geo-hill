@@ -1,46 +1,42 @@
-from enum import Enum
-
 from typing import Any, Dict, List
 
 from .team_color import TeamColor
 from .team import Team
 from .user import User
-
+from .status import Status
 import random
-
-
-class Status(Enum):
-    START = 1
-    ACTIVE = 2
-    FINISH = 3
 
 
 class Game:
     def __init__(self, name: str, duration: float):
         self.id: str = name
         self.duration: float = duration
+        self.time_limit: float = duration
         self.potential_blue_team_count: int = 0
         self.potential_red_team_count: int = 0
         self.potential_auto_assign_count: int = 0
         self.blue_team: Team = Team()
         self.red_team: Team = Team()
         self.status: Status = Status.START
-        self.user_names: Dict[str, TeamColor] = {}
+        self.usernames: Dict[str, TeamColor] = {}
+        self.last_in_control: TeamColor = TeamColor.NONE
 
     def to_dict(self):
         return {
             "id": self.id,
             "duration": self.duration,
+            "time_limit": self.time_limit,
             "red_team_count": self.potential_red_team_count,
             "blue_team_count": self.potential_blue_team_count,
             "auto_count": self.potential_auto_assign_count,
             "status": str(self.status.name),
+            "control": str(self.last_in_control),
         }
 
     def start_game(self):
         # initialize teams here
         red_team, blue_team, auto_assign = [], [], []
-        for user_name, team in self.user_names.items():
+        for user_name, team in self.usernames.items():
             if team == TeamColor.RED:
                 red_team.append(user_name)
             elif team == TeamColor.BLUE:
@@ -53,7 +49,8 @@ class Game:
             random.shuffle(auto_assign)
 
         Game.balance_teams(red_team, blue_team, auto_assign)
-
+        self.potential_blue_team_count = len(self.blue_team.users)
+        self.potential_red_team_count = len(self.red_team.users)
         self.status = Status.ACTIVE
 
     def end_game(self):
@@ -61,42 +58,72 @@ class Game:
 
     def add_user(self, user_name: str, team: TeamColor):
         u = User(user_name)
-        if u.user_name in self.user_names:
+        if u.user_name in self.usernames:
             return False
 
-        self.user_names[u.user_name] = team
+        self.usernames[u.user_name] = team
         if team == TeamColor.RED:
             self.potential_blue_team_count += 1
         elif team == TeamColor.BLUE:
             self.potential_red_team_count += 1
-        elif team == TeamColor.AUTO:
+        elif team == TeamColor.NONE:
             self.potential_auto_assign_count += 1
 
         return True
 
     def set_user(self, user_name: str, new_team: TeamColor):
-        if user_name not in self.user_names:
+        if user_name not in self.usernames:
             return False
 
-        old_team = self.user_names[user_name]
+        old_team = self.usernames[user_name]
 
         if old_team == TeamColor.BLUE:
             self.potential_blue_team_count -= 1
         elif old_team == TeamColor.RED:
             self.potential_red_team_count -= 1
-        elif old_team == TeamColor.AUTO:
+        elif old_team == TeamColor.NONE:
             self.potential_auto_assign_count -= 1
 
-        self.user_names[user_name] = new_team
+        self.usernames[user_name] = new_team
 
         if new_team == TeamColor.BLUE:
             self.potential_blue_team_count += 1
         elif new_team == TeamColor.RED:
             self.potential_red_team_count += 1
-        elif new_team == TeamColor.AUTO:
+        elif new_team == TeamColor.NONE:
             self.potential_auto_assign_count += 1
 
         return True
+
+    def update_username_map(self):
+        """ Updates username map to match red and blue team lists
+
+        """
+        for user in self.blue_team.users:
+            self.usernames[user.user_name] = TeamColor.BLUE
+        for user in self.red_team.users:
+            self.usernames[user.user_name] = TeamColor.RED
+
+    def perform_score_change(self):
+        if (
+            self.blue_team.in_geofence_count == 0
+            and self.red_team.in_geofence_count > 0
+        ):
+            self.red_team.score += 1
+            self.last_in_control = TeamColor.RED
+        elif (
+            self.red_team.in_geofence_count == 0
+            and self.blue_team.in_geofence_count > 0
+        ):
+            self.blue_team.score += 1
+            self.last_in_control = TeamColor.BLUE
+        elif (
+            self.red_team.in_geofence_count != 0
+            and self.blue_team.in_geofence_count != 0
+        ):
+            self.last_in_control = TeamColor.CONTESTED
+        else:
+            self.last_in_control = TeamColor.NONE
 
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
