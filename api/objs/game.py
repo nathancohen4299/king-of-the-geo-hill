@@ -48,6 +48,10 @@ class Game:
             else:
                 auto_assign.append(user_name)
 
+        # shuffle teams for randomness
+        for i in range(0, 2):
+            random.shuffle(auto_assign)
+
         Game.balance_teams(red_team, blue_team, auto_assign)
 
         self.status = Status.ACTIVE
@@ -102,9 +106,6 @@ class Game:
             fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2) :]
             list1.extend(fh)
             list2.extend(sh)
-
-        for i in range(0, 2):
-            random.shuffle(auto)
 
         if len(team1) == len(team2):
             split_and_add_list_evenly(team1, team2, auto)
