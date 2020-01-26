@@ -36,6 +36,7 @@ class Game:
             "auto_count": self.potential_auto_assign_count,
             "status": str(self.status.name)
         }
+
     def start_game(self):
         # initialize teams here
         red_team, blue_team, auto_assign = [], [], []
@@ -91,8 +92,6 @@ class Game:
         elif new_team == TeamColor.AUTO:
             self.potential_auto_assign_count += 1
 
-
-
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
 
@@ -124,4 +123,3 @@ class Game:
             equalizer, remainder = auto[:difference], auto[difference:]
             team2.extend(equalizer)
             split_and_add_list_evenly(team1, team2, remainder)
-

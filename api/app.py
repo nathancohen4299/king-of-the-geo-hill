@@ -52,9 +52,9 @@ def user_route():
         game_id = json["game_id"]
         team_color_str = json["team_color"].upper()
 
-        #try:
+        # try:
         team = TeamColor(team_color_str)
-       # except:
+        # except:
         #   abort(HTTPStatus.NOT_FOUND, "team does not exist")
         if game_id not in games:
             abort(HTTPStatus.NOT_FOUND, "Game ID")
@@ -67,7 +67,7 @@ def user_route():
     abort(HTTPStatus.BAD_REQUEST)
 
 
-@app.route("/game", methods=["POST", "GET"])
+@app.route("/game", methods=["POST"])
 def game_route():
     json = request.get_json()
     if request.method == "POST":
@@ -77,13 +77,16 @@ def game_route():
         else:
             games[game.id] = game
         return jsonify(game.to_dict())
-    elif request.method == "GET":
-        if json["game_id"] in games:
-            return jsonify(games[json["game_id"]].to_dict())
+    abort(HTTPStatus.BAD_REQUEST)
+
+
+@app.route("/game/<game_id>/lobby", methods=["GET"])
+def game_get_route(game_id: str):
+    if request.method == "GET":
+        if game_id in games:
+            return jsonify(games[game_id].to_dict())
         else:
             abort(HTTPStatus.NOT_FOUND)
-
-    abort(HTTPStatus.BAD_REQUEST)
 
 
 @app.route("/team/<game_id>", methods=["GET"])
