@@ -5,6 +5,7 @@ import { useNavigation } from 'react-navigation-hooks'
 import { useLargeTextInput, LargeTextInput } from '../components/LargeTextInput'
 import { LargeHeader } from '../components/LargeHeader'
 import { Colors } from '../store/Colors'
+import Snackbar from 'react-native-snackbar'
 
 export const JoinGamePage = () => {
     const navigation = useNavigation()
@@ -42,13 +43,18 @@ function onJoinGame(navigation, game_id, user_id) {
                 return response.json()
             }
             else {
+                Snackbar.show({
+                    text: 'ERROR invalid input',
+                    duration: Snackbar.LENGTH_LONG,
+                    textColor: '#FFF',
+                    backgroundColor: Colors.TRON_RED,
+                    fontFamily: 'Bangers-Regular'
+                });
                 return undefined
             }
         }).then(responseJson => {
             if (responseJson !== undefined) { 
                 navigation.navigate('GameSetup', {game_id: responseJson['id'], user_id: user_id, duration: response['duration'], isOwner: false})    
-            } else {
-                // TODO error message
             }
         })
         .catch((error) => {

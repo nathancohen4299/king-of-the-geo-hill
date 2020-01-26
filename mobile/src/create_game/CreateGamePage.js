@@ -4,6 +4,7 @@ import { LargeButton } from '../components/LargeButton'
 import { useNavigation } from 'react-navigation-hooks'
 import { LargeTextInput, LargeNumericTextInput, useLargeTextInput } from '../components/LargeTextInput'
 import { LargeHeader } from '../components/LargeHeader'
+import Snackbar from 'react-native-snackbar'
 
 export const CreateGamePage = () => {
     const [game_id, onChangeGameId] = useLargeTextInput()
@@ -49,7 +50,13 @@ const onCreateGame = async (navigation, game_id, user_id, duration) => {
                 return response.json()
             }
             else {
-                return undefined
+                Snackbar.show({
+                    text: 'ERROR invalid input',
+                    duration: Snackbar.LENGTH_LONG,
+                    textColor: '#FFF',
+                    backgroundColor: Colors.TRON_RED,
+                    fontFamily: 'Bangers-Regular'
+                });
             }
         }).then(responseJson => {
             console.log(responseJson)

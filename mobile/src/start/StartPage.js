@@ -1,13 +1,40 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { View, Text, TouchableOpacity } from 'react-native'
 import { LargeButton } from '../components/LargeButton' 
 import { useNavigation } from 'react-navigation-hooks';
 import { LargeHeader } from '../components/LargeHeader';
 import { Colors } from '../store/Colors';
+import { _hasData, _retrieveData } from '../store/LocalStorage';
 
 export const StartPage = () => {
     const navigation = useNavigation()
+
+    useEffect(() => {   
+        if (_hasData('GameData')) {
+            const data = _retrieveData('GameData')
+
+            // check if active
+            fetch('https://bulldog.ryanjchen.com/game/score/' + data['game_id'], {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then((response) => {
+                if (response.status == 200) {
+                    navigation.navigate('Game', {game_id: data['game_id'], team: data['team'], username: data['username']})
+                }
+                else {
+                    _removeData('GameData')
+                }
+            }).then(responseJson => {
+                
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }, []) 
+
     return (
         
         <View style={{flex: 1}}>

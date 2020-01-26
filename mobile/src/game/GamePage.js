@@ -5,6 +5,7 @@ import { LargeHeader } from '../components/LargeHeader'
 import { MassiveHeader } from '../components/MassiveHeader'
 import Radar  from 'react-native-radar'
 import { useNavigation } from 'react-navigation-hooks'
+import { _storeData, _removeData, _hasData } from '../store/LocalStorage'
 
 export const GamePage = () => {
     const navigation = useNavigation()
@@ -17,12 +18,26 @@ export const GamePage = () => {
     useEffect(() => {
         Radar.setUserId(username)
         Radar.requestPermissions(false)
+        Radar.trackOnce(() => {
+
+        }).then(result => {
+
+        }).catch(error => {
+
+        })
+        Radar.setMetadata({game_id: game_id})
         Radar.startTracking()
     }, [])
 
     useEffect(() => {
+        //if (!_hasData('GameData')) {
+            _storeData('GameData', {game_id: game_id, username: username, team: myTeam})
+        //}
+
         listen(game_id, setDuration, changeTeam, navigation, myTeam)
     }, [])
+
+
     // check no one in zone
     if (team === 'NONE') {
         return (
@@ -38,7 +53,7 @@ export const GamePage = () => {
         return (
             <View style={{backgroundColor: Colors.TRON_YELLOW, height: '100%'}}>
                 <View style={{margin: '5%'}}></View>
-                <MassiveHeader text={toString(duration)} color={'#FFF'} fontFamily={'Call of Ops Duty'}/>
+                <MassiveHeader text={duration} color={'#FFF'} fontFamily={'Call of Ops Duty'}/>
                 <LargeHeader text={'ZONE IS CONTESTED'} color={'#FFF'}/>
             </View>
         )
@@ -48,20 +63,20 @@ export const GamePage = () => {
 
     if (myTeam !== team) {
         return (
-            <View style={{height: '100%', backgroundColor: team === 'blue' ? Colors.BLUE: Colors.TRON_RED}}>
+            <View style={{height: '100%', backgroundColor: team === 'BLUE' ? Colors.BLUE: Colors.TRON_RED}}>
                 <View style={{height: '15%'}}></View>
-                <MassiveHeader text={toString(duration)} color={'#FFF'} fontFamily={'Call of Ops Duty'}/>
+                <MassiveHeader text={duration} color={'#FFF'} fontFamily={'Call of Ops Duty'}/>
                 <View style={{height: '10%'}}></View>
                 <LargeHeader text={team + ' is in control'} color={'#FFF' } size={64} fontFamily={'Call of Ops Duty'}/>
                 <View style={{height: '10%'}}></View>
-                <LargeHeader text={'reclaim the point'} color={team === 'red' ? Colors.BLUE : Colors.TRON_RED} size={36} fontFamily={'Call of Ops Duty'}/>
+                <LargeHeader text={'reclaim the point'} color={team === 'BLUE' ? Colors.BLUE : Colors.TRON_RED} size={36} fontFamily={'Call of Ops Duty'}/>
             </View>
         )
     } else {
         return (
-            <View style={{height: '100%', backgroundColor: team === 'blue' ? Colors.BLUE: Colors.TRON_RED}}>
+            <View style={{height: '100%', backgroundColor: team === 'BLUE' ? Colors.BLUE: Colors.TRON_RED}}>
                 <View style={{height: '15%'}}></View>
-                <MassiveHeader text={toString(duration)} color={'#FFF'} fontFamily={'Call of Ops Duty'}/>
+                <MassiveHeader text={duration} color={'#FFF'} fontFamily={'Call of Ops Duty'}/>
                 <View style={{height: '10%'}}></View>
                 <LargeHeader text={'you are in control'} color={'#FFF' } size={64} fontFamily={'Call of Ops Duty'}/>
                 <View style={{height: '10%'}}></View>
@@ -93,6 +108,7 @@ function listen(game_id, setDuration, changeTeam, navigation, myTeam) {
 
                 if (responseJson['duration'] === 0)  {
                     clearInterval(process)
+                    _removeData('GameData')
                     navigation.navigate('Result', {game_id: game_id, team: myTeam})
                 }
             }
