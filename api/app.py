@@ -192,7 +192,9 @@ def score_route(game_id: str):
     if game_id not in games:
         abort(HTTPStatus.NOT_FOUND, "game_id")
     score_dict = {"red_team_score": games[game_id].red_team.score,
-                  "blue_team_score": games[game_id].blue_team.score}
+                  "blue_team_score": games[game_id].blue_team.score,
+                  "control": games[game_id].last_in_control,
+                  "duration": games[game_id].duration}
     return jsonify(score_dict)
 
 

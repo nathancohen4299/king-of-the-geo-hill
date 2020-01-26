@@ -27,15 +27,18 @@ class Game:
         self.red_team: Team = Team()
         self.status: Status = Status.START
         self.usernames: Dict[str, TeamColor] = {}
+        self.last_in_control: TeamColor = TeamColor.AUTO
 
     def to_dict(self):
         return {
             "id": self.id,
             "duration": self.duration,
+            "time_limit": self.time_limit,
             "red_team_count": self.potential_red_team_count,
             "blue_team_count": self.potential_blue_team_count,
             "auto_count": self.potential_auto_assign_count,
             "status": str(self.status.name),
+            "control": self.last_in_control
         }
 
     def start_game(self):
@@ -54,7 +57,8 @@ class Game:
             random.shuffle(auto_assign)
 
         Game.balance_teams(red_team, blue_team, auto_assign)
-
+        self.potential_blue_team_count = len(self.blue_team.users)
+        self.potential_red_team_count = len(self.red_team.users)
         self.status = Status.ACTIVE
 
     def end_game(self):
@@ -114,13 +118,21 @@ class Game:
             and self.red_team.in_geofence_count > 0
         ):
             self.red_team.score += 1
-            return TeamColor.RED
+            self.last_in_control = TeamColor.RED
         elif (
             self.red_team.in_geofence_count == 0
             and self.blue_team.in_geofence_count > 0
         ):
             self.blue_team.score += 1
-            return TeamColor.BLUE
+            self.last_in_control = TeamColor.BLUE
+        elif (
+                self.red_team.in_geofence_count != 0
+                and self.blue_team.in_geofence_count != 0
+        ):
+            self.last_in_control = TeamColor.CONTESTED
+        else:
+            self.last_in_control = TeamColor.AUTO
+
 
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
