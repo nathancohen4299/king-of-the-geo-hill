@@ -15,18 +15,20 @@ app = Flask(__name__)
 
 games: Dict[str, Game] = {}
 
+
 class Config(object):
     JOBS = [
         {
-            'id': 'interval_update',
-            'func': 'app:interval_update',
-            'args': (1, 2),
-            'trigger': 'interval',
-            'seconds': 1
+            "id": "interval_update",
+            "func": "app:interval_update",
+            "args": (1, 2),
+            "trigger": "interval",
+            "seconds": 1,
         }
     ]
 
     SCHEDULER_API_ENABLED = True
+
 
 def interval_update():
     print("deeeeeAAAAAR JOOOOOOOOHNNN")
@@ -41,6 +43,7 @@ def timer_start():
     # scheduler.api_enabled = True
     scheduler.init_app(app)
     scheduler.start()
+
 
 @app.route("/")
 def index():
