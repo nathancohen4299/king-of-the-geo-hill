@@ -48,36 +48,38 @@ games: Dict[str, Game] = {}
 def update_score(geofence_information):
     # log users here
 
-    polygon_coordinates = [ (c[0], c[1]) for c in geofence_information["geometry"]["coordinates"] ]
-    zone = Polygon(polygon_coordinates)
+    print(geofence_information)
 
-    
+    polygon_coordinates = [ (c[0], c[1]) for c in geofence_information["geofence"]["geometry"]["coordinates"][0] ]
+    print(polygon_coordinates)
+    zone = Polygon(polygon_coordinates)
 
     for game in games.keys():
         g = games[game]
         for username in g.usernames.keys():
             if g.usernames[useranme] == TeamColors.RED:
                 # check red
-                lat, long = g.red_team.users[username].get_coords()
-                p = Point(lat, long)
+                lat, lon = g.red_team.users[username].get_coords()
+                p = Point(lat, lon)
                 if zone.contains(p):
                     games[game_id].red_team.in_geofence_count += 1
             elif g.usernames[user] == TeamColors.BLUE:
                 # check blue
                 lat, long = g.blue_team.users[username].get_coords()
-                p = Point(lat, long)
-
-
-    for user in users_in_geofence:
-        user_id = user["userId"]
-
-        game_id = j["user"]["metadata"]["game_id"]
-        if game_id in games:
-            if user_id in games[game_id].usernames:
-                if games[game_id].usernames[user_id] == TeamColor.RED:
-                    games[game_id].red_team.in_geofence_count += 1
-                elif games[game_id].usernames[user_id] == TeamColor.BLUE:
+                p = Point(lat, lon)
+                if zone.contains(p):
                     games[game_id].blue_team.in_geofence_count += 1
+
+#     for user in users_in_geofence:
+        # user_id = user["userId"]
+
+        # game_id = j["user"]["metadata"]["game_id"]
+        # if game_id in games:
+            # if user_id in games[game_id].usernames:
+                # if games[game_id].usernames[user_id] == TeamColor.RED:
+                    # games[game_id].red_team.in_geofence_count += 1
+                # elif games[game_id].usernames[user_id] == TeamColor.BLUE:
+                    # games[game_id].blue_team.in_geofence_count += 1
 
     for game in games.values():
         if game.status == Status.ACTIVE:
