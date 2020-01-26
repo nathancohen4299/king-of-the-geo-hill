@@ -27,7 +27,7 @@ def game_route():
             abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")
         else:
             games[game.id] = game
-            games[game.id].add_user(user_id)
+            games[game.id].add_user(user_id, TeamColor.AUTO)
         return jsonify(game.to_dict())
     abort(HTTPStatus.BAD_REQUEST)
 
