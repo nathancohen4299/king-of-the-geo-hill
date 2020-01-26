@@ -39,3 +39,12 @@ def test_team_balance_4():
     list2_len_before = len(list2)
     Game.balance_teams(list1, list2, list3)
     assert len(list1) == list1_len_before and len(list2) == list2_len_before
+
+
+def test_team_balance_5():
+    list1 = []
+    list2 = []
+    list3 = [1]
+    Game.balance_teams(list1, list2, list3)
+    assert len(list1) == len(list3) or len(list2) == len(list3)
+    assert len(list1) + len(list2) == len(list3)

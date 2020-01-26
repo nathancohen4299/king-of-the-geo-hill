@@ -1,11 +1,11 @@
 import logging
+import os
 from http import HTTPStatus
 from typing import Dict, List, Any
-import requests
-from flask_apscheduler import APScheduler
-from flask import Flask, jsonify, request, abort
 
-import os
+import requests
+from flask import Flask, jsonify, request, abort
+from flask_apscheduler import APScheduler
 
 from api.objs.game import Game
 from api.objs.status import Status
@@ -17,7 +17,7 @@ app = Flask(__name__)
 def get_users_in_geofence():
     headers = {"Authorization": os.getenv("radar_private_key")}
     r = requests.get(
-        "https://api.radar.io/v1/geofences/5e2c9c6e5f526200f02d9cb4/users",
+        "https://api.radar.io/v1/geofences/5e2d585adb7df6004d1cb8b9/users",
         headers=headers,
     )
     app.logger.info(r.text)
@@ -26,23 +26,7 @@ def get_users_in_geofence():
     update_score(r.json()["users"])
 
 
-# class Config(object):
-# JOBS = [
-# {
-# "id": "get_users_in_geofence",
-# "func": "app:get_users_in_geofence",
-# "args": (),
-# "trigger": "interval",
-# "seconds": 1,
-# }
-# ]
-
-# SCHEDULER_API_ENABLED = True
-
-# app.config.from_object(Config())
 scheduler = APScheduler()
-# it is also possible to enable the API directly
-# scheduler.api_enabled = True
 scheduler.init_app(app)
 scheduler.start()
 app.apscheduler.add_job(
@@ -60,14 +44,24 @@ def update_score(users_in_geofence: List[Dict[str, Any]]):
     # log users here
 
     for user in users_in_geofence:
-        game_id = user["metadata"]["game_id"]
-        user_id = user["metadata"]["userId"]
+        user_id = user["userId"]
+       
+
+
+        headers = {"Authorization": os.getenv("radar_private_key")}
+
+        a = "https://api.radar.io/v1/users/{}".format(user_id)
+        app.logger.info(a)
+        r = requests.get(a, headers=headers)
+        j = r.json()
+        app.logger.critical(j)
+        game_id = j["user"]["metadata"]["game_id"]
         if game_id in games:
-            if user_id in games[user_id].usernames:
-                if games[user_id].usernames[user_id] == TeamColor.RED:
-                    games[user_id].red_team.in_geofence_count += 1
-                elif games[user_id].usernames[user_id] == TeamColor.BLUE:
-                    games[user_id].blue_team.in_geofence_count += 1
+            if user_id in games[game_id].usernames:
+                if games[game_id].usernames[user_id] == TeamColor.RED:
+                    games[game_id].red_team.in_geofence_count += 1
+                elif games[game_id].usernames[user_id] == TeamColor.BLUE:
+                    games[game_id].blue_team.in_geofence_count += 1
 
     for game in games.values():
         if game.status == Status.ACTIVE:
@@ -80,6 +74,12 @@ def update_score(users_in_geofence: List[Dict[str, Any]]):
             game.duration -= 1
             if game.duration == 0:
                 game.status = Status.FINISH
+
+
+def validate_args(*args):
+    for a in args:
+        if not a:
+            abort(HTTPStatus.UNPROCESSABLE_ENTITY)
 
 
 @app.route("/")
@@ -119,6 +119,7 @@ def user_route(game_id: str, user_id: str):
 
         return jsonify(games[game_id].usernames[user_id].value)
     elif request.method == "PUT":
+        validate_args(json["team_color"])
         team_color_str = json["team_color"].upper()
 
         team = TeamColor(team_color_str)
@@ -165,8 +166,10 @@ def game_end(game_id: str):
 @app.route("/game", methods=["POST"])
 def game_route():
     json = request.get_json()
-    user_id = json["user_id"]
+    validate_args(json["user_id"], json["game_id"], json["duration"])
+
     if request.method == "POST":
+        user_id = json["user_id"]
         game = Game(json["game_id"], json["duration"])
         if game.id in games:
             abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")

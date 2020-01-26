@@ -106,20 +106,20 @@ class Game:
 
     def perform_score_change(self):
         if (
-            self.blue_team.in_geofence_count == 0
-            and self.red_team.in_geofence_count > 0
+                self.blue_team.in_geofence_count == 0
+                and self.red_team.in_geofence_count > 0
         ):
             self.red_team.score += 1
             self.last_in_control = TeamColor.RED
         elif (
-            self.red_team.in_geofence_count == 0
-            and self.blue_team.in_geofence_count > 0
+                self.red_team.in_geofence_count == 0
+                and self.blue_team.in_geofence_count > 0
         ):
             self.blue_team.score += 1
             self.last_in_control = TeamColor.BLUE
         elif (
-            self.red_team.in_geofence_count != 0
-            and self.blue_team.in_geofence_count != 0
+                self.red_team.in_geofence_count != 0
+                and self.blue_team.in_geofence_count != 0
         ):
             self.last_in_control = TeamColor.CONTESTED
         else:
@@ -128,14 +128,15 @@ class Game:
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
         def split_and_add_list_evenly(
-            list1: List[Any], list2: List[Any], list3: List[Any]
+                list1: List[Any], list2: List[Any], list3: List[Any]
         ):
-            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2) :]
+            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2):]
             list1.extend(fh)
             list2.extend(sh)
 
         if len(team1) == len(team2):
             split_and_add_list_evenly(team1, team2, auto)
+            return
 
         difference = len(team1) - len(team2)
         if difference > 0:
