@@ -7,6 +7,8 @@ from api.objs.team import Team
 from api.objs.team_color import TeamColor
 from api.objs.user import User
 
+import logging
+
 app = Flask(__name__)
 
 games: Dict[str, Game] = {}
@@ -44,6 +46,7 @@ def game_get_route(game_id: str):
 @app.route("/game/<game_id>/<user_id>", methods=["POST", "GET", "PUT"])
 def user_route(game_id: str, user_id: str):
     json = request.get_json()
+    logging.debug(json)
     if request.method == "POST":
         game_id: str = game_id
 
