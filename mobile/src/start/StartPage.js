@@ -5,7 +5,9 @@ import { LargeButton } from '../components/LargeButton'
 import { useNavigation } from 'react-navigation-hooks';
 import { LargeHeader } from '../components/LargeHeader';
 import { Colors } from '../store/Colors';
-import { _hasData, _retrieveData } from '../store/LocalStorage';
+import { _hasData, _retrieveData, _removeData } from '../store/LocalStorage';
+
+import Geolocation from '@react-native-community/geolocation';
 
 export const StartPage = () => {
     const navigation = useNavigation()
@@ -22,8 +24,8 @@ export const StartPage = () => {
                 },
                 body: JSON.stringify({
                     user_id: data['username'],
-                    latitude: 0,
-                    longitude: 0
+                    latitude: "0",
+                    longitude: "0"
                 })
             }).then((response) => {
                 if (response.status == 200) {
@@ -38,6 +40,8 @@ export const StartPage = () => {
                 console.error(error);
             });
         }
+        
+
     }, []) 
 
     return (
@@ -63,3 +67,8 @@ function onCreateGamePressed(navigation) {
 function onJoinGamePressed(navigation) {
     navigation.navigate('JoinGame')
 }
+
+async function requestFineAccess() {
+    Geolocation.setRNConfiguration({});
+    Geolocation.requestAuthorization();
+  }

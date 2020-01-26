@@ -6,6 +6,7 @@ import { MassiveHeader } from '../components/MassiveHeader'
 import Radar from 'react-native-radar'
 import { useNavigation } from 'react-navigation-hooks'
 import { _storeData, _removeData, _hasData } from '../store/LocalStorage'
+import Geolocation from '@react-native-community/geolocation';
 
 export const GamePage = () => {
     const navigation = useNavigation()
@@ -14,8 +15,8 @@ export const GamePage = () => {
     const username = navigation.getParam('username', 'null_use')
     const game_id = navigation.getParam('game_id', 'null_game')
     const [duration, setDuration] = useState(0)
-    const [latitude, setLatitude] = useState(0)
-    const [longitude, setLongitude] = useState(0)
+    const [latitude, setLatitude] = useState(0.0)
+    const [longitude, setLongitude] = useState(0.0)
 
     useEffect(() => {
         Radar.setUserId(username)
@@ -32,12 +33,14 @@ export const GamePage = () => {
     }, [])
 
     useEffect(() => {
-        //if (!_hasData('GameData')) {
         _storeData('GameData', { game_id: game_id, username: username, team: myTeam })
-        //}
 
         listen(game_id, setDuration, changeTeam, navigation, myTeam, setLatitude, setLongitude, latitude, longitude, username)
     }, [])
+
+    useEffect(() => {
+        console.log(latitude + ' , '  + longitude)
+    }, [latitude, longitude])
 
 
     // check no one in zone
@@ -97,8 +100,8 @@ function listen(game_id, setDuration, changeTeam, navigation, myTeam, setLatitud
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                latitude: latitude,
-                longitude: longitude,   
+                latitude: latitude.toString(),
+                longitude: longitude.toString(),   
                 user_id: user_id
             }),
         }).then((response) => {
@@ -127,12 +130,9 @@ function listen(game_id, setDuration, changeTeam, navigation, myTeam, setLatitud
 }
 
 function getLocation(setLatitude, setLongitude) {
-    navigator.geolocation.getCurrentPosition(
-        position => {
-            setLatitude(position['coords']['latitude'])
-            setLongitude(position['coords']['longitude'])
-        },
-        error => Alert.alert(error.message),
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
+    Geolocation.getCurrentPosition(info => {
+        setLatitude(info['coords']['latitude'])
+        setLongitude(info['coords']['longitude'])
+    }, error => {}, {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000});
 }
+
