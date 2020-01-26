@@ -70,8 +70,7 @@ def user_route(game_id: str, user_id: str):
 
         return jsonify(games[game_id].user_names[user_id].value)
     elif request.method == "PUT":
-        user_id = json["user_name"]
-        team_color_str = json["team_color"].upper()
+g        team_color_str = json["team_color"].upper()
 
         team = TeamColor(team_color_str)
 
