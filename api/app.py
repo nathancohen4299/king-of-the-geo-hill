@@ -53,7 +53,7 @@ def user_route(game_id: str, user_id: str):
         if game_id not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
 
-        if not games[game_id].add_user(json["user_name"], TeamColor.AUTO):
+        if not games[game_id].add_user(user_id, TeamColor.AUTO):
             abort(HTTPStatus.CONFLICT)
 
         ret_dict = {
