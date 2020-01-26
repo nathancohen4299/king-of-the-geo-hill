@@ -48,8 +48,8 @@ def update_score(geofence_information):
         (c[0], c[1])
         for c in geofence_information["geofence"]["geometry"]["coordinates"][0]
     ]
+    
     zone = Polygon(polygon_coordinates)
-    print(zone.area)
 
     for game_id in games.keys():
         g = games[game_id]
