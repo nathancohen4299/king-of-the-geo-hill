@@ -26,23 +26,7 @@ def get_users_in_geofence():
     update_score(r.json()["users"])
 
 
-# class Config(object):
-# JOBS = [
-# {
-# "id": "get_users_in_geofence",
-# "func": "app:get_users_in_geofence",
-# "args": (),
-# "trigger": "interval",
-# "seconds": 1,
-# }
-# ]
-
-# SCHEDULER_API_ENABLED = True
-
-# app.config.from_object(Config())
 scheduler = APScheduler()
-# it is also possible to enable the API directly
-# scheduler.api_enabled = True
 scheduler.init_app(app)
 scheduler.start()
 app.apscheduler.add_job(
@@ -82,6 +66,12 @@ def update_score(users_in_geofence: List[Dict[str, Any]]):
                 game.status = Status.FINISH
 
 
+def validate_args(*args):
+    for a in args:
+        if not a:
+            abort(HTTPStatus.UNPROCESSABLE_ENTITY)
+
+
 @app.route("/")
 def index():
     return jsonify(success=True)
@@ -119,6 +109,7 @@ def user_route(game_id: str, user_id: str):
 
         return jsonify(games[game_id].usernames[user_id].value)
     elif request.method == "PUT":
+        validate_args(json["team_color"])
         team_color_str = json["team_color"].upper()
 
         team = TeamColor(team_color_str)
@@ -165,8 +156,10 @@ def game_end(game_id: str):
 @app.route("/game", methods=["POST"])
 def game_route():
     json = request.get_json()
-    user_id = json["user_id"]
+    validate_args(json["user_id"], json["game_id"], json["duration"])
+
     if request.method == "POST":
+        user_id = json["user_id"]
         game = Game(json["game_id"], json["duration"])
         if game.id in games:
             abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")

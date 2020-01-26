@@ -13,9 +13,13 @@ import { CreateGamePage } from './src/create_game/CreateGamePage';
 import { JoinGamePage } from './src/join_game/JoinGamePage';
 import { GameSetupPage } from './src/game_setup/GameSetupPage';
 import { GamePage } from './src/game/GamePage';
+import { ResultPage } from './src/result/ResultPage';
+import { DeveloperPage } from './src/developer/DeveloperPage';
 
 const MainNavigator = createStackNavigator({
   Start: {screen: StartPage},
+  Developer: {screen: DeveloperPage},
+  Result: {screen: ResultPage},
   GameSetup: {screen: GameSetupPage},
   Game: {screen: GamePage},
   JoinGame: {screen: JoinGamePage},
