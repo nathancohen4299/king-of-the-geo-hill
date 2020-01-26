@@ -21,8 +21,7 @@ geofence_id = "5e2d585adb7df6004d1cb8b9"
 def get_users_in_geofence():
     headers = {"Authorization": os.getenv("radar_private_key")}
     r = requests.get(
-        "https://api.radar.io/v1/geofences/{}".format(geofence_id),
-        headers=headers,
+        "https://api.radar.io/v1/geofences/{}".format(geofence_id), headers=headers,
     )
     app.logger.info(r.text)
     app.logger.info(os.getenv("KEY"))
@@ -45,7 +44,10 @@ games: Dict[str, Game] = {}
 
 
 def update_score(geofence_information):
-    polygon_coordinates = [(c[0], c[1]) for c in geofence_information["geofence"]["geometry"]["coordinates"][0]]
+    polygon_coordinates = [
+        (c[0], c[1])
+        for c in geofence_information["geofence"]["geometry"]["coordinates"][0]
+    ]
     zone = Polygon(polygon_coordinates)
     print(zone.area)
 
@@ -56,13 +58,25 @@ def update_score(geofence_information):
                 if g.usernames[user_id] == TeamColor.RED:
                     lat, lon = g.red_team.users[user_id].get_coordinates()
                     p: Point = Point(lat, lon)
-                    app.logger.info({"game_id": game_id, "user_id": user_id, "coordinates": "({}, {})".format[lat, lon]})
+                    app.logger.info(
+                        {
+                            "game_id": game_id,
+                            "user_id": user_id,
+                            "coordinates": "({}, {})".format[lat, lon],
+                        }
+                    )
                     if zone.contains(p):
                         games[game_id].red_team.in_geofence_count += 1
                 elif g.usernames[user_id] == TeamColor.BLUE:
                     lat, lon = g.blue_team.users[user_id].get_coordinates()
                     p: Point = Point(lat, lon)
-                    app.logger.info({"game_id": game_id, "user_id": user_id, "coordinates": "({}, {})".format[lat, lon]})
+                    app.logger.info(
+                        {
+                            "game_id": game_id,
+                            "user_id": user_id,
+                            "coordinates": "({}, {})".format[lat, lon],
+                        }
+                    )
                     if zone.contains(p):
                         games[game_id].blue_team.in_geofence_count += 1
 
