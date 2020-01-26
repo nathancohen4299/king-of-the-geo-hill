@@ -36,6 +36,8 @@ target 'mobile' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'react-native-radar', :path => '../node_modules/react-native-radar'
+
   target 'mobileTests' do
     inherit! :search_paths
     # Pods for testing

@@ -12,12 +12,14 @@ import {createStackNavigator} from 'react-navigation-stack';
 import { CreateGamePage } from './src/create_game/CreateGamePage';
 import { JoinGamePage } from './src/join_game/JoinGamePage';
 import { GameSetupPage } from './src/game_setup/GameSetupPage';
+import { GamePage } from './src/game/GamePage';
 
 const MainNavigator = createStackNavigator({
-  GameSetup: {screen: GameSetupPage},
   Start: {screen: StartPage},
-  CreateGame: {screen: CreateGamePage},
+  GameSetup: {screen: GameSetupPage},
+  Game: {screen: GamePage},
   JoinGame: {screen: JoinGamePage},
+  CreateGame: {screen: CreateGamePage},
 }, {
   headerMode: 'none',
   navigationOptions: {
