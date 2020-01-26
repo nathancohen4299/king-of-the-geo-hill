@@ -4,3 +4,4 @@ requests
 flask_apscheduler
 wheel
 black
+shapely

@@ -24,10 +24,10 @@ def get_users_in_geofence():
         "https://api.radar.io/v1/geofences/{}".format(geofence_id),
         headers=headers,
     )
-    print(r.text)
-    app.logger.info(r.text)
-    app.logger.info(os.getenv("KEY"))
-    app.logger.critical(r.json())
+    # print(r.text)
+    # app.logger.info(r.text)
+    # app.logger.info(os.getenv("KEY"))
+    # app.logger.critical(r.json())
     update_score(r.json())
 
 
@@ -48,25 +48,27 @@ games: Dict[str, Game] = {}
 def update_score(geofence_information):
     # log users here
 
-    print(geofence_information)
+    # print(geofence_information)
 
     polygon_coordinates = [ (c[0], c[1]) for c in geofence_information["geofence"]["geometry"]["coordinates"][0] ]
-    print(polygon_coordinates)
+    # print(polygon_coordinates)
     zone = Polygon(polygon_coordinates)
 
     for game in games.keys():
         g = games[game]
         for username in g.usernames.keys():
-            if g.usernames[useranme] == TeamColors.RED:
+            if g.usernames[username] == TeamColor.RED:
                 # check red
                 lat, lon = g.red_team.users[username].get_coords()
                 p = Point(lat, lon)
+                print(p)
                 if zone.contains(p):
                     games[game_id].red_team.in_geofence_count += 1
-            elif g.usernames[user] == TeamColors.BLUE:
+            elif g.usernames[username] == TeamColor.BLUE:
                 # check blue
                 lat, long = g.blue_team.users[username].get_coords()
                 p = Point(lat, lon)
+                print(p)
                 if zone.contains(p):
                     games[game_id].blue_team.in_geofence_count += 1
 
