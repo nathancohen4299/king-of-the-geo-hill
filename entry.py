@@ -28,12 +28,5 @@ def get_users_in_geofence():
     # update_score(r.json()["users"])
 
 
-def main():
-    app.config.from_object(Config())
-
-    scheduler = APScheduler()
-    # it is also possible to enable the API directly
-    # scheduler.api_enabled = True
-    scheduler.init_app(app)
-    scheduler.start()
-    return app
+if __name__ == "__ main__":
+    app.run()
