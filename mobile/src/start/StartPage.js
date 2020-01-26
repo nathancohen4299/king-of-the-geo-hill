@@ -16,10 +16,15 @@ export const StartPage = () => {
 
             // check if active
             fetch('https://bulldog.ryanjchen.com/game/score/' + data['game_id'], {
-                method: 'GET',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({
+                    user_id: data['username'],
+                    latitude: 0,
+                    longitude: 0
+                })
             }).then((response) => {
                 if (response.status == 200) {
                     navigation.navigate('Game', {game_id: data['game_id'], team: data['team'], username: data['username']})
