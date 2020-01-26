@@ -271,7 +271,7 @@ def score_route(game_id: str):
 @app.route("/info", methods=["GET"])
 def get_all_stats():
     stats_dict = {
-        "games": [game.to_dict() for game in games.values()],
+        "games": [game.to_verbose_dict() for game in games.values()],
     }
     return jsonify(stats_dict)
 

@@ -33,6 +33,20 @@ class Game:
             "control": str(self.last_in_control),
         }
 
+    def to_verbose_dict(self):
+        return {
+            "id": self.id,
+            "duration": self.duration,
+            "time_limit": self.time_limit,
+            "red_team_count": self.potential_red_team_count,
+            "blue_team_count": self.potential_blue_team_count,
+            "auto_count": self.potential_auto_assign_count,
+            "status": str(self.status.name),
+            "control": str(self.last_in_control),
+            "red_team": self.blue_team.to_dict(),
+            "blue_team": self.red_team.to_dict()
+        }
+
     def start_game(self):
         # initialize teams here
         red_team, blue_team, auto_assign = [], [], []
