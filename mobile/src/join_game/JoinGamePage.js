@@ -31,10 +31,28 @@ export const JoinGamePage = () => {
     );
 }
 
-function onJoinGame(navigation, gameName) {
-    // TODO 
-    // perform request 
-
-    navigation.navigate('GameSetup', {code: responseJson['code'], name: responseJson['name'], isOwner: false})
+function onJoinGame(navigation, game_id, user_id) {
+    fetch('https://bulldog.ryanjchen.com/game/' + game_id + '/user_id/' + user_id, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        }).then((response) => {
+            if (response.status == 200) {
+                return response.json()
+            }
+            else {
+                return undefined
+            }
+        }).then(responseJson => {
+            if (responseJson !== undefined) { 
+                navigation.navigate('GameSetup', {code: responseJson['id'], name: responseJson['id'], isOwner: false})    
+            } else {
+                // TODO error message
+            }
+        })
+        .catch((error) => {
+        console.error(error);
+    });
     
 }

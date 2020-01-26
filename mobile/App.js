@@ -15,10 +15,10 @@ import { GameSetupPage } from './src/game_setup/GameSetupPage';
 import { GamePage } from './src/game/GamePage';
 
 const MainNavigator = createStackNavigator({
-  Game: {screen: GamePage},
-  GameSetup: {screen: GameSetupPage},
-  JoinGame: {screen: JoinGamePage},
   Start: {screen: StartPage},
+  GameSetup: {screen: GameSetupPage},
+  Game: {screen: GamePage},
+  JoinGame: {screen: JoinGamePage},
   CreateGame: {screen: CreateGamePage},
 }, {
   headerMode: 'none',

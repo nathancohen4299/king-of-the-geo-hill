@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { LargeHeader } from '../components/LargeHeader'
 import { MediumHeader } from '../components/MediumHeader'
 import { Colors } from '../store/Colors'
@@ -9,18 +9,26 @@ import { View, TouchableOpacity } from 'react-native'
 
 export const GameSetupPage = () => {
     const navigation = useNavigation()
-    const [team, changeTeam] = useState('blue')
-    const code =   navigation.getParam('code' ,'undefined')
-    const duration =  navigation.getParam('duration', 'undefined')
-    const name =      navigation.getParam('name', 'undefined')
+    const [team, changeTeam] = useState('auto')
+    const code =   navigation.getParam('code' ,'null')
+    const duration =  navigation.getParam('duration', 0)
+    const name =      navigation.getParam('name', 'null_game')
+    const username = navigation.getParam('username', 'null_user')
     const isOwner = navigation.getParam('isOwner', false)
-    const blueCount = 0
-    const redCount = 0
-    const autoCount = 0
+    const [redCount  , setRedCount] = useState(0)
+    const [blueCount , setBlueCount] = useState(0)
+    const [autoCount , setAutoCount] = useState(0)
 
     const toggleTeam = (newTeam) => {
-        if (newTeam !== team) { changeTeam(newTeam) } 
+        if (newTeam !== team) { 
+            changeTeam(newTeam)
+            changeTeamRequest(username, name, newTeam)
+         } 
     }
+
+    useEffect(() => {
+        listen(name, setRedCount, setBlueCount, setAutoCount)
+    })
 
     return (
         <>
@@ -60,4 +68,65 @@ export const GameSetupPage = () => {
             </View>
         </>
     )
+}
+
+function changeTeamRequest(user_id, game_id, team) {
+    console.log(game_id + ' ' + user_id + ' ' + team) 
+    fetch('https://bulldog.ryanjchen.com/game/' + game_id + '/user/' + user_id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            team_color: team
+        }),
+        }).then((response) => {
+            console.log(response.status)
+            if (response.status == 200) {
+                return response.json()
+            }
+            else {
+                return undefined
+            }
+        }).then(responseJson => {
+            console.log(responseJson)
+            if (responseJson !== undefined) { 
+
+            } else {
+                // TODO error message
+            }
+        })
+        .catch((error) => {
+        console.error(error);
+    });
+}
+
+function listen(game_id, setRedCount, setBlueCount, setAutoCount) {
+    var process = setInterval(() => {
+        fetch('https://bulldog.ryanjchen.com/game/' + game_id, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        }).then((response) => {
+            if (response.status == 200) {
+                return response.json()
+            }
+            else {
+                return undefined
+            }
+        }).then(responseJson => {
+            if (responseJson !== undefined) { 
+                // console.log(responseJson)
+                setRedCount(responseJson['red_team_count'])
+                setBlueCount(responseJson['blue_team_count'])
+                setAutoCount(responseJson['auto_count'])
+            } else {
+                // TODO error message
+            }
+        })
+        .catch((error) => {
+        console.error(error);
+    });
+    }, 500)
 }

@@ -8,11 +8,12 @@ import { LargeHeader } from '../components/LargeHeader'
 export const CreateGamePage = () => {
     const [gameName, onChangeGameName] = useLargeTextInput()
     const [duration, onChangeDuration] = useLargeTextInput()
+    const [user_id, onChangeUserId] = useLargeTextInput()
     const navigation = useNavigation()
 
     return (
         <>
-            <View style={[{height: '20%'}]} />
+            <View style={[{height: '15%'}]} />
 
             <LargeHeader text='Create Game' />
 
@@ -22,20 +23,24 @@ export const CreateGamePage = () => {
             <View style={[{height: '2.5%'}]} />
 
             <LargeNumericTextInput text={duration} onChangeText={onChangeDuration} placeholder='enter a duration' />
+            <View style={[{height: '2.5%'}]} />
+            <LargeTextInput text={user_id} onChangeText={onChangeUserId} placeholder='enter username' />
+
 
             <LargeButton text='Create' color="#339933" onPress={() => onCreateGame(navigation, gameName, duration)}/>
         </>
     );
 }
 
-const onCreateGame = async (navigation, gameName, duration) => {
-    fetch('http://bulldog.ryanjchen.com:5000/game', {
+const onCreateGame = async (navigation, game_id, user_id, duration) => {
+    fetch('https://bulldog.ryanjchen.com/game', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            game_name: gameName,
+            game_id: game_id,
+            user_id: user_id,
             duration: parseFloat(duration)
         }),
         }).then((response) => {
@@ -47,7 +52,7 @@ const onCreateGame = async (navigation, gameName, duration) => {
             }
         }).then(responseJson => {
             if (responseJson !== undefined) { 
-                navigation.navigate('GameSetup', {code: responseJson['code'], name: responseJson['name'], isOwner: true})
+                navigation.navigate('GameSetup', {code: responseJson['id'], name: responseJson['id'], username: user_id, duration: parseFloat(duration), isOwner: true})
             } else {
                 // TODO error message
             }

@@ -1,13 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Colors } from '../store/Colors'
 import { View } from 'react-native'
 import { LargeHeader } from '../components/LargeHeader'
 import { MassiveHeader } from '../components/MassiveHeader'
+import Radar  from 'react-native-radar'
+import { useNavigation } from 'react-navigation-hooks'
 
 export const GamePage = () => {
-
+    const navigation = useNavigation()
     const [team, changeTeam] = useState('blue')
     const myTeam = 'blue'
+    const username = navigation.getParam('username', 'null_use')
+    useEffect(() => {
+        Radar.setUserId(username)
+        Radar.requestPermissions(false)
+        Radar.startTracking()
+    })
 
     if (myTeam !== team) {
         return (
