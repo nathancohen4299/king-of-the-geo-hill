@@ -73,10 +73,12 @@ def user_route(game_id: str, user_id: str):
     elif request.method == "GET":
 
         if game_id not in games:
-            abort(HTTPStatus.NOT_FOUND, "Game ID")
+            logging.error("game_id: {} Not Found. Returned 404".format(game_id))
+            abort(HTTPStatus.NOT_FOUND, "game_id")
 
         if user_id not in games[game_id].user_names:
-            abort(HTTPStatus.NOT_FOUND, "User")
+            logging.error("user_id: {} Not Found. Returned 404".format(user_id))
+            abort(HTTPStatus.NOT_FOUND, "user_id")
 
         return jsonify(games[game_id].user_names[user_id].value)
     elif request.method == "PUT":
