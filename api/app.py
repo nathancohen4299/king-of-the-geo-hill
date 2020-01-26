@@ -19,8 +19,7 @@ def index():
     return jsonify(HTTPStatus.OK)
 
 
-
-@app.route("/game/<game_id>/<user_id>", methods=["POST", "GET", "PUT"])
+@app.route("/game/<game_id>/user/<user_id>", methods=["POST", "GET", "PUT"])
 def user_route(game_id: str, user_id: str):
     json = request.get_json()
     logging.info(json)
