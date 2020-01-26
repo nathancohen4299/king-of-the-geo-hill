@@ -8,9 +8,8 @@ import { Colors } from '../store/Colors'
 
 export const JoinGamePage = () => {
     const navigation = useNavigation()
-    const [ gameName, onChangeGameName ] = useLargeTextInput()
-    const [ username, onChangeUsername ] = useLargeTextInput()
-
+    const [ game_id, onChangeGameId ] = useLargeTextInput()
+    const [ user_id, onChangeUserId ] = useLargeTextInput()
 
     return (
         <>
@@ -20,13 +19,13 @@ export const JoinGamePage = () => {
 
             <View style={[{height: '2.5%'}]} />
 
-            <LargeTextInput value={gameName} onChangeValue={onChangeGameName} placeholder={'enter game name'} />
+            <LargeTextInput value={game_id} onChangeValue={onChangeGameId} placeholder={'enter game name'} />
 
             <View style={[{height: '2.5%'}]} />
 
-            <LargeTextInput value={gameName} onChangeValue={onChangeUsername} placeholder={'enter username'} />
+            <LargeTextInput value={game_id} onChangeValue={onChangeUserId} placeholder={'enter username'} />
 
-            <LargeButton text='Join' color={Colors.TRON_GREEN} onPress={() => onJoinGame(navigation, gameName)}/>
+            <LargeButton text='Join' color={Colors.TRON_GREEN} onPress={() => onJoinGame(navigation, game_id, user_id)}/>
         </>
     );
 }
@@ -38,6 +37,7 @@ function onJoinGame(navigation, game_id, user_id) {
             'Content-Type': 'application/json',
         },
         }).then((response) => {
+            console.log(response.status)
             if (response.status == 200) {
                 return response.json()
             }
@@ -46,7 +46,7 @@ function onJoinGame(navigation, game_id, user_id) {
             }
         }).then(responseJson => {
             if (responseJson !== undefined) { 
-                navigation.navigate('GameSetup', {code: responseJson['id'], name: responseJson['id'], isOwner: false})    
+                navigation.navigate('GameSetup', {game_id: responseJson['id'], user_id: user_id, duration: response['duration'], isOwner: false})    
             } else {
                 // TODO error message
             }

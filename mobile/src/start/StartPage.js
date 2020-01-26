@@ -17,7 +17,7 @@ export const StartPage = () => {
             <View style={[{height: '1.5%'}]} />
             <LargeButton text='Join Game' color={Colors.TRON_YELLOW} onPress={() => onJoinGamePressed(navigation)}/>
             <View style={{flexGrow: 1}}></View>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Developer')}>
                 <Text style={{textAlign: "right", color: "#666", padding: 4}}>support the developers :^)</Text>
             </TouchableOpacity>
         </View>

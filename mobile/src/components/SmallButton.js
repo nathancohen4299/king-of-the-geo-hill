@@ -2,10 +2,10 @@ import React from 'react'
 import {View, Text, TouchableOpacity} from 'react-native'
 import { Colors } from '../store/Colors';
 
-export const LargeButton = ({text, color, onPress, textColor=Colors.DARK_GRAY}) => {
+export const SmallButton = ({text, color, onPress, textColor=Colors.DARK_GRAY}) => {
     return (
         <>
-            <View style={[{ width: "70%", marginHorizontal: '15%' }]}>
+            <View style={[{ width: "40%", marginHorizontal: '30%' }]}>
                 <TouchableOpacity 
                     onPress={onPress} 
                     style={{ 
