@@ -17,11 +17,11 @@ def index():
     return jsonify(HTTPStatus.OK)
 
 
-@app.route("/user", methods=["POST", "GET", "PUT"])
-def user_route():
+@app.route("/game/<game_id>/<user_id>", methods=["POST", "GET", "PUT"])
+def user_route(game_id: str, user_id: str):
     json = request.get_json()
     if request.method == "POST":
-        game_id: str = json["game_id"]
+        game_id: str = game_id
 
         if game_id not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
@@ -37,32 +37,27 @@ def user_route():
 
         return jsonify(ret_dict)
     elif request.method == "GET":
-        user_name = json["user_name"]
-        game_id = json["game_id"]
 
         if game_id not in games:
             abort(HTTPStatus.NOT_FOUND, "Game ID")
 
-        if user_name not in games[game_id].user_names:
+        if user_id not in games[game_id].user_names:
             abort(HTTPStatus.NOT_FOUND, "User")
 
-        return jsonify(games[game_id].user_names[user_name].value)
+        return jsonify(games[game_id].user_names[user_id].value)
     elif request.method == "PUT":
-        user_name = json["user_name"]
-        game_id = json["game_id"]
+        user_id = json["user_name"]
         team_color_str = json["team_color"].upper()
 
-        # try:
         team = TeamColor(team_color_str)
-        # except:
-        #   abort(HTTPStatus.NOT_FOUND, "team does not exist")
+
         if game_id not in games:
             abort(HTTPStatus.NOT_FOUND, "Game ID")
 
-        if user_name not in games[game_id].user_names:
+        if user_id not in games[game_id].user_names:
             abort(HTTPStatus.NOT_FOUND, "User")
 
-        games[game_id].set_user(user_name, team)
+        games[game_id].set_user(user_id, team)
 
     abort(HTTPStatus.BAD_REQUEST)
 
@@ -80,7 +75,7 @@ def game_route():
     abort(HTTPStatus.BAD_REQUEST)
 
 
-@app.route("/game/<game_id>/lobby", methods=["GET"])
+@app.route("/game/<game_id>", methods=["GET"])
 def game_get_route(game_id: str):
     if request.method == "GET":
         if game_id in games:
