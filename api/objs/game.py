@@ -7,8 +7,6 @@ from .status import Status
 import random
 
 
-
-
 class Game:
     def __init__(self, name: str, duration: float):
         self.id: str = name
@@ -21,7 +19,7 @@ class Game:
         self.red_team: Team = Team()
         self.status: Status = Status.START
         self.usernames: Dict[str, TeamColor] = {}
-        self.last_in_control: TeamColor = TeamColor.AUTO
+        self.last_in_control: TeamColor = TeamColor.NONE
 
     def to_dict(self):
         return {
@@ -32,7 +30,7 @@ class Game:
             "blue_team_count": self.potential_blue_team_count,
             "auto_count": self.potential_auto_assign_count,
             "status": str(self.status.name),
-            "control": str(self.last_in_control)
+            "control": str(self.last_in_control),
         }
 
     def start_game(self):
@@ -68,7 +66,7 @@ class Game:
             self.potential_blue_team_count += 1
         elif team == TeamColor.BLUE:
             self.potential_red_team_count += 1
-        elif team == TeamColor.AUTO:
+        elif team == TeamColor.NONE:
             self.potential_auto_assign_count += 1
 
         return True
@@ -83,7 +81,7 @@ class Game:
             self.potential_blue_team_count -= 1
         elif old_team == TeamColor.RED:
             self.potential_red_team_count -= 1
-        elif old_team == TeamColor.AUTO:
+        elif old_team == TeamColor.NONE:
             self.potential_auto_assign_count -= 1
 
         self.usernames[user_name] = new_team
@@ -92,7 +90,7 @@ class Game:
             self.potential_blue_team_count += 1
         elif new_team == TeamColor.RED:
             self.potential_red_team_count += 1
-        elif new_team == TeamColor.AUTO:
+        elif new_team == TeamColor.NONE:
             self.potential_auto_assign_count += 1
 
         return True
@@ -120,13 +118,12 @@ class Game:
             self.blue_team.score += 1
             self.last_in_control = TeamColor.BLUE
         elif (
-                self.red_team.in_geofence_count != 0
-                and self.blue_team.in_geofence_count != 0
+            self.red_team.in_geofence_count != 0
+            and self.blue_team.in_geofence_count != 0
         ):
             self.last_in_control = TeamColor.CONTESTED
         else:
-            self.last_in_control = TeamColor.AUTO
-
+            self.last_in_control = TeamColor.NONE
 
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
