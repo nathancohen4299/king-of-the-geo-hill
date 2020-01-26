@@ -136,6 +136,7 @@ class Game:
 
         if len(team1) == len(team2):
             split_and_add_list_evenly(team1, team2, auto)
+            return
 
         difference = len(team1) - len(team2)
         if difference > 0:
