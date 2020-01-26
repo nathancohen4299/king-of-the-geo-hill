@@ -45,7 +45,7 @@ games: Dict[str, Game] = {}
 
 def update_score(geofence_information):
     polygon_coordinates = [
-        (c[0], c[1])
+        (float(c[0]), float(c[1]))
         for c in geofence_information["geofence"]["geometry"]["coordinates"][0]
     ]
     
@@ -57,24 +57,24 @@ def update_score(geofence_information):
             for user_id in g.usernames.keys():
                 if g.usernames[user_id] == TeamColor.RED:
                     lat, lon = g.red_team.users[user_id].get_coordinates()
-                    p: Point = Point(lat, lon)
+                    p: Point = Point(float(lat), float(lon))
                     app.logger.info(
                         {
                             "game_id": game_id,
                             "user_id": user_id,
-                            "coordinates": "({}, {})".format[lat, lon],
+                            "coordinates": "({}, {})".format(lat, lon),
                         }
                     )
                     if zone.contains(p):
                         games[game_id].red_team.in_geofence_count += 1
                 elif g.usernames[user_id] == TeamColor.BLUE:
                     lat, lon = g.blue_team.users[user_id].get_coordinates()
-                    p: Point = Point(lat, lon)
+                    p: Point = Point(float(lat), float(lon))
                     app.logger.info(
                         {
                             "game_id": game_id,
                             "user_id": user_id,
-                            "coordinates": "({}, {})".format[lat, lon],
+                            "coordinates": "({}, {})".format(lat, lon),
                         }
                     )
                     if zone.contains(p):
