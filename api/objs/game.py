@@ -34,7 +34,7 @@ class Game:
             "red_team_count": self.potential_red_team_count,
             "blue_team_count": self.potential_blue_team_count,
             "auto_count": self.potential_auto_assign_count,
-            "status": str(self.status.name)
+            "status": str(self.status.name),
         }
 
     def start_game(self):
@@ -96,9 +96,10 @@ class Game:
 
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
-
-        def split_and_add_list_evenly(list1: List[Any], list2: List[Any], list3: List[Any]):
-            fh, sh = list3[:(len(list3) // 2)], list3[(len(list3) // 2):]
+        def split_and_add_list_evenly(
+            list1: List[Any], list2: List[Any], list3: List[Any]
+        ):
+            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2) :]
             list1.extend(fh)
             list2.extend(sh)
 

@@ -95,8 +95,10 @@ def game_route():
 def teams_route(game_id: str):
     if request.method == "GET":
         if game_id in games:
-            return_dict = {"blue_team": games[game_id].blue_team.to_dict(),
-                           "red_team": games[game_id].red_team.to_dict()}
+            return_dict = {
+                "blue_team": games[game_id].blue_team.to_dict(),
+                "red_team": games[game_id].red_team.to_dict(),
+            }
             return jsonify(return_dict)
 
     abort(HTTPStatus.NOT_FOUND)
@@ -106,8 +108,10 @@ def teams_route(game_id: str):
 def team_count(game_id: str):
     if request.method == "GET":
         if game_id in games:
-            return_dict = {"blue_team_count": len(games[game_id].blue_team.users),
-                           "red_team_count": len(games[game_id].red_team.users)}
+            return_dict = {
+                "blue_team_count": len(games[game_id].blue_team.users),
+                "red_team_count": len(games[game_id].red_team.users),
+            }
             return jsonify(return_dict)
 
     abort(HTTPStatus.NOT_FOUND)
