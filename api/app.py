@@ -231,7 +231,7 @@ def score_route(game_id: str):
     score_dict = {
         "red_team_score": games[game_id].red_team.score,
         "blue_team_score": games[game_id].blue_team.score,
-        "control": games[game_id].last_in_control,
+        "control": str(games[game_id].last_in_control),
         "duration": games[game_id].duration,
     }
     return jsonify(score_dict)
