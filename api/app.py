@@ -102,6 +102,22 @@ def game_get_route(game_id: str):
             abort(HTTPStatus.NOT_FOUND)
 
 
+@app.route("/game/start/<game_id>", methods=["POST"])
+def game_start(game_id: str):
+    if game_id not in games:
+        abort(HTTPStatus.NOT_FOUND, "game_id")
+    games[game_id].start_game()
+    return jsonify(success=True)
+
+
+@app.route("/game/end/<game_id>", methods=["POST"])
+def game_end(game_id: str):
+    if game_id not in games:
+        abort(HTTPStatus.NOT_FOUND, "game_id")
+    games[game_id].end_game()
+    return jsonify(success=True)
+
+
 @app.route("/game", methods=["POST"])
 def game_route():
     json = request.get_json()
@@ -171,9 +187,13 @@ def team_count_spec(game_id: str, team_color: str):
     abort(HTTPStatus.NOT_FOUND)
 
 
-@app.route("/game/score", methods=["GET"])
-def score_route():
-    return jsonify("UNIMPLEMENTED")
+@app.route("/game/score/<game_id>", methods=["GET"])
+def score_route(game_id: str):
+    if game_id not in games:
+        abort(HTTPStatus.NOT_FOUND, "game_id")
+    score_dict = {"red_team_score": games[game_id].red_team.score,
+                  "blue_team_score": games[game_id].blue_team.score}
+    return jsonify(score_dict)
 
 
 if __name__ == "__main__":
