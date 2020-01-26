@@ -23,6 +23,7 @@ def index():
 def game_route():
     json = request.get_json()
     user_id = json["user_id"]
+    logging.info(user_id)
     if request.method == "POST":
         game = Game(json["game_id"], json["duration"])
         if game.id in games:
@@ -46,7 +47,7 @@ def game_get_route(game_id: str):
 @app.route("/game/<game_id>/<user_id>", methods=["POST", "GET", "PUT"])
 def user_route(game_id: str, user_id: str):
     json = request.get_json()
-    logging.debug(json)
+    logging.info(json)
     if request.method == "POST":
         game_id: str = game_id
 
