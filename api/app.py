@@ -5,6 +5,8 @@ import requests
 from flask_apscheduler import APScheduler
 from flask import Flask, jsonify, request, abort
 
+import os
+
 from api.objs.game import Game
 from api.objs.status import Status
 from api.objs.team_color import TeamColor
@@ -13,12 +15,13 @@ app = Flask(__name__)
 
 
 def get_users_in_geofence():
-    headers = {"Authorization": "prj_test_sk_593c83bc7be1078df3fd09f125eb776f96906dee"}
+    headers = {"Authorization": os.getenv("radar_private_key")}
     r = requests.get(
         "https://api.radar.io/v1/geofences/5e2c9c6e5f526200f02d9cb4/users",
         headers=headers,
     )
     app.logger.info(r.text)
+    app.logger.info(os.getenv("KEY"))
     app.logger.critical(r.json()["users"])
     update_score(r.json()["users"])
 
