@@ -6,3 +6,6 @@ class User:
 
     def to_dict(self):
         return {"user_name": self.user_name}
+
+    def get_coordinates(self) -> (float, float):
+        return self.latitude, self.longitude
