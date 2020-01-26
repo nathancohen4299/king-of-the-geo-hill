@@ -23,8 +23,8 @@ export const ResultPage = () => {
             },
             body: JSON.stringify({
                 user_id: user_id,
-                latitude: 0,
-                longitude: 0  
+                latitude: "0",
+                longitude: "0"  
             })
         }).then((response) => {
             if (response.status == 200) {
