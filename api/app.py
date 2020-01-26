@@ -24,10 +24,9 @@ def get_users_in_geofence():
         "https://api.radar.io/v1/geofences/{}".format(geofence_id),
         headers=headers,
     )
-    # print(r.text)
-    # app.logger.info(r.text)
-    # app.logger.info(os.getenv("KEY"))
-    # app.logger.critical(r.json())
+    app.logger.info(r.text)
+    app.logger.info(os.getenv("KEY"))
+    app.logger.info(r.json())
     update_score(r.json())
 
 
@@ -46,12 +45,7 @@ games: Dict[str, Game] = {}
 
 
 def update_score(geofence_information):
-    # log users here
-
-    # print(geofence_information)
-
     polygon_coordinates = [(c[0], c[1]) for c in geofence_information["geofence"]["geometry"]["coordinates"][0]]
-    # print(polygon_coordinates)
     zone = Polygon(polygon_coordinates)
     print(zone.area)
 
@@ -60,21 +54,16 @@ def update_score(geofence_information):
         if games[game_id].status == Status.ACTIVE:
             for user_id in g.usernames.keys():
                 if g.usernames[user_id] == TeamColor.RED:
-                    # check red
                     lat, lon = g.red_team.users[user_id].get_coordinates()
-                    p = Point(lat, lon)
-                    print(p.within(zone))
+                    p: Point = Point(lat, lon)
+                    app.logger.info({"game_id": game_id, "user_id": user_id, "coordinates": "({}, {})".format[lat, lon]})
                     if zone.contains(p):
-                        print("hello")
                         games[game_id].red_team.in_geofence_count += 1
                 elif g.usernames[user_id] == TeamColor.BLUE:
-                    # check blue
                     lat, lon = g.blue_team.users[user_id].get_coordinates()
-                    p = Point(lat, lon)
-                    print(p.within(zone))
-                    print(p)
+                    p: Point = Point(lat, lon)
+                    app.logger.info({"game_id": game_id, "user_id": user_id, "coordinates": "({}, {})".format[lat, lon]})
                     if zone.contains(p):
-                        print("hello")
                         games[game_id].blue_team.in_geofence_count += 1
 
     for game_id in games.values():
