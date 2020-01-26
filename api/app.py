@@ -235,10 +235,26 @@ def team_count_spec(game_id: str, team_color: str):
     abort(HTTPStatus.NOT_FOUND)
 
 
-@app.route("/game/score/<game_id>", methods=["GET"])
+@app.route("/game/score/<game_id>", methods=["PUT"])
 def score_route(game_id: str):
     if game_id not in games:
         abort(HTTPStatus.NOT_FOUND, "game_id")
+    json = request.get_json()
+    validate_args(json["user_id"], json["latitude"], json["longitude"])
+
+    user_id: str = json["user_id"]
+    latitude: float = json["latitude"]
+    longitude: float = json["longitude"]
+
+    team = games[game_id].usernames[user_id]
+
+    if team == TeamColor.RED:
+        games[game_id].red_team.users[user_id].latitude = latitude
+        games[game_id].red_team.users[user_id].longitude = longitude
+    elif team == TeamColor.BLUE:
+        games[game_id].blue_team.users[user_id].latitude = latitude
+        games[game_id].blue_team.users[user_id].longitude = longitude
+
     score_dict = {
         "red_team_score": games[game_id].red_team.score,
         "blue_team_score": games[game_id].blue_team.score,
