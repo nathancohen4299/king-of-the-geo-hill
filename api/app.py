@@ -7,6 +7,8 @@ from api.objs.team import Team
 from api.objs.team_color import TeamColor
 from api.objs.user import User
 
+import logging
+
 app = Flask(__name__)
 
 games: Dict[str, Game] = {}
@@ -17,67 +19,77 @@ def index():
     return jsonify(HTTPStatus.OK)
 
 
-@app.route("/user", methods=["POST", "GET"])
-def user_route():
+@app.route("/game/<game_id>/user/<user_id>", methods=["POST", "GET", "PUT"])
+def user_route(game_id: str, user_id: str):
     json = request.get_json()
+    logging.info(json)
     if request.method == "POST":
-        s = json["team_code"].split("-")
-        team: TeamColor = TeamColor(s[1].upper())
-        game_id: str = s[0]
+        game_id: str = game_id
 
         if game_id not in games:
             return jsonify(HTTPStatus.NOT_FOUND)
-        u = User(json["user_name"])
 
-        if not games[game_id].add_user(u, team):
+        if not games[game_id].add_user(user_id, TeamColor.AUTO):
             abort(HTTPStatus.CONFLICT)
 
         ret_dict = {
             "game_id": games[game_id].id,
             "status": games[game_id].status.name,
             "duration": games[game_id].duration,
-            "team_color": games[game_id].user_names[u.user_name].name,
         }
 
         return jsonify(ret_dict)
     elif request.method == "GET":
-        user_name = json["user_name"]
-        game_id = json["game_id"]
+
+        if game_id not in games:
+            logging.error("game_id: {} Not Found. Returned 404".format(game_id))
+            abort(HTTPStatus.NOT_FOUND, "game_id")
+
+        if user_id not in games[game_id].user_names:
+            logging.error("user_id: {} Not Found. Returned 404".format(user_id))
+            abort(HTTPStatus.NOT_FOUND, "user_id")
+
+        return jsonify(games[game_id].user_names[user_id].value)
+    elif request.method == "PUT":
+        team_color_str = json["team_color"].upper()
+
+        team = TeamColor(team_color_str)
 
         if game_id not in games:
             abort(HTTPStatus.NOT_FOUND, "Game ID")
 
-        if user_name not in games[game_id].user_names:
+        if user_id not in games[game_id].user_names:
             abort(HTTPStatus.NOT_FOUND, "User")
 
-        team_color: TeamColor = games[game_id].user_names[user_name]
+        if not games[game_id].set_user(user_id, team):
+            abort(HTTPStatus.CONFLICT, "Something went wrong")
 
-        if team_color == TeamColor.RED:
-            return jsonify(games[game_id].red_team.users[user_name].to_dict())
-        elif team_color == TeamColor.BLUE:
-            return jsonify(games[game_id].blue_team.users[user_name].to_dict())
-
-        abort(HTTPStatus.BAD_REQUEST)
+        return jsonify("OK")
 
     abort(HTTPStatus.BAD_REQUEST)
 
 
-@app.route("/game", methods=["POST", "GET"])
-def game_route():
-    json = request.get_json()
-    if request.method == "POST":
-        game = Game(json["game_id"], json["duration"])
-        if game.id in games:
-            return jsonify(HTTPStatus.CONFLICT)
-        else:
-            games[game.id] = game
-        return jsonify(game.to_dict())
-    elif request.method == "GET":
-        if json["game_id"] in games:
-            return jsonify(games[json["game_id"]].to_dict())
+@app.route("/game/<game_id>", methods=["GET"])
+def game_get_route(game_id: str):
+    if request.method == "GET":
+        if game_id in games:
+            return jsonify(games[game_id].to_dict())
         else:
             abort(HTTPStatus.NOT_FOUND)
 
+
+@app.route("/game", methods=["POST"])
+def game_route():
+    json = request.get_json()
+    user_id = json["user_id"]
+    if request.method == "POST":
+        game = Game(json["game_id"], json["duration"])
+        if game.id in games:
+            abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")
+        else:
+            games[game.id] = game
+            games[game.id].add_user(user_id, TeamColor.AUTO)
+        return jsonify(game.to_dict())
     abort(HTTPStatus.BAD_REQUEST)
 
 
@@ -85,8 +97,10 @@ def game_route():
 def teams_route(game_id: str):
     if request.method == "GET":
         if game_id in games:
-            return_dict = {"blue_team": games[game_id].blue_team.to_dict(),
-                           "red_team": games[game_id].red_team.to_dict()}
+            return_dict = {
+                "blue_team": games[game_id].blue_team.to_dict(),
+                "red_team": games[game_id].red_team.to_dict(),
+            }
             return jsonify(return_dict)
 
     abort(HTTPStatus.NOT_FOUND)
@@ -96,8 +110,10 @@ def teams_route(game_id: str):
 def team_count(game_id: str):
     if request.method == "GET":
         if game_id in games:
-            return_dict = {"blue_team_count": len(games[game_id].blue_team.users),
-                           "red_team_count": len(games[game_id].red_team.users)}
+            return_dict = {
+                "blue_team_count": len(games[game_id].blue_team.users),
+                "red_team_count": len(games[game_id].red_team.users),
+            }
             return jsonify(return_dict)
 
     abort(HTTPStatus.NOT_FOUND)
@@ -126,7 +142,7 @@ def team_count_spec(game_id: str, team_color: str):
             elif team == TeamColor.blue:
                 return {"count": len(games[game_id].blue_team.users)}
 
-            abort(HTTPStatus.NOT_FOUND, "Team Not Founda")
+            abort(HTTPStatus.NOT_FOUND, "Team Not Found")
 
     abort(HTTPStatus.NOT_FOUND)
 
