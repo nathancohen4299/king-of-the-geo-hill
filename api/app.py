@@ -18,7 +18,7 @@ def get_users_in_geofence():
         "https://api.radar.io/v1/geofences/5e2c9c6e5f526200f02d9cb4/users",
         headers=headers,
     )
-    app.logger.critical(r.text)
+    app.logger.info(r.text)
     app.logger.critical(r.json()["users"])
     update_score(r.json()["users"])
 
@@ -45,6 +45,10 @@ scheduler.start()
 app.apscheduler.add_job(
     "yeet", get_users_in_geofence, trigger="interval", args=(), seconds=1
 )
+
+gunicorn_logger = logging.getLogger("gunicorn.error")
+app.logger.handlers = gunicorn_logger.handlers
+app.logger.setLevel(gunicorn_logger.level)
 
 games: Dict[str, Game] = {}
 
@@ -83,7 +87,7 @@ def index():
 @app.route("/game/<game_id>/user/<user_id>", methods=["POST", "GET", "PUT"])
 def user_route(game_id: str, user_id: str):
     json = request.get_json()
-    logging.info(json)
+    app.logger.info(json)
     if request.method == "POST":
         game_id: str = game_id
 
@@ -103,11 +107,11 @@ def user_route(game_id: str, user_id: str):
     elif request.method == "GET":
 
         if game_id not in games:
-            logging.error("game_id: {} Not Found. Returned 404".format(game_id))
+            app.logger.error("game_id: {} Not Found. Returned 404".format(game_id))
             abort(HTTPStatus.NOT_FOUND, "game_id")
 
         if user_id not in games[game_id].usernames:
-            logging.error("user_id: {} Not Found. Returned 404".format(user_id))
+            app.logger.error("user_id: {} Not Found. Returned 404".format(user_id))
             abort(HTTPStatus.NOT_FOUND, "user_id")
 
         return jsonify(games[game_id].usernames[user_id].value)
