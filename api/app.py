@@ -1,11 +1,11 @@
 import logging
+import os
 from http import HTTPStatus
 from typing import Dict, List, Any
-import requests
-from flask_apscheduler import APScheduler
-from flask import Flask, jsonify, request, abort
 
-import os
+import requests
+from flask import Flask, jsonify, request, abort
+from flask_apscheduler import APScheduler
 
 from api.objs.game import Game
 from api.objs.status import Status
