@@ -1,15 +1,47 @@
 import logging
 from http import HTTPStatus
 from typing import Dict, List, Any
-
+import requests
+from flask_apscheduler import APScheduler
 from flask import Flask, jsonify, request, abort
 
 from api.objs.game import Game, Status
 from api.objs.team_color import TeamColor
 
 app = Flask(__name__)
+def get_users_in_geofence():
+    headers = {"Authorization": "prj_test_sk_593c83bc7be1078df3fd09f125eb776f96906dee"}
+    r = requests.get(
+        "https://api.radar.io/v1/geofences/5e2c9c6e5f526200f02d9cb4/users",
+        headers=headers,
+    )
+    app.logger.critical(r.text)
+    app.logger.critical(r.json()["users"])
+    # update_score(r.json()["users"])
+
+# class Config(object):
+    # JOBS = [
+        # {
+            # "id": "get_users_in_geofence",
+            # "func": "app:get_users_in_geofence",
+            # "args": (),
+            # "trigger": "interval",
+            # "seconds": 1,
+        # }
+    # ]
+
+    # SCHEDULER_API_ENABLED = True
+
+# app.config.from_object(Config())
+scheduler = APScheduler()
+# it is also possible to enable the API directly
+# scheduler.api_enabled = True
+scheduler.init_app(app)
+scheduler.start()
+app.apscheduler.add_job("yeet", get_users_in_geofence, trigger='interval', args=(), seconds=1)
 
 games: Dict[str, Game] = {}
+
 
 
 def update_score(users_in_geofence: List[Dict[str, Any]]):

@@ -28,7 +28,7 @@ def get_users_in_geofence():
     # update_score(r.json()["users"])
 
 
-if __name__ == "__main__":
+def main():
     app.config.from_object(Config())
 
     scheduler = APScheduler()
@@ -36,5 +36,4 @@ if __name__ == "__main__":
     # scheduler.api_enabled = True
     scheduler.init_app(app)
     scheduler.start()
-
-    app.run()
+    return app
