@@ -33,6 +33,20 @@ class Game:
             "control": str(self.last_in_control),
         }
 
+    def to_verbose_dict(self):
+        return {
+            "id": self.id,
+            "duration": self.duration,
+            "time_limit": self.time_limit,
+            "red_team_count": self.potential_red_team_count,
+            "blue_team_count": self.potential_blue_team_count,
+            "auto_count": self.potential_auto_assign_count,
+            "status": str(self.status.name),
+            "control": str(self.last_in_control),
+            "red_team": self.blue_team.to_dict(),
+            "blue_team": self.red_team.to_dict(),
+        }
+
     def start_game(self):
         # initialize teams here
         red_team, blue_team, auto_assign = [], [], []
@@ -51,6 +65,12 @@ class Game:
         Game.balance_teams(red_team, blue_team, auto_assign)
         self.potential_blue_team_count = len(self.blue_team.users)
         self.potential_red_team_count = len(self.red_team.users)
+
+        # Add user to sets
+        for username in red_team:
+            self.red_team.users[username] = User(username)
+        for username in blue_team:
+            self.blue_team.users[username] = User(username)
         self.status = Status.ACTIVE
 
     def end_game(self):
@@ -106,20 +126,20 @@ class Game:
 
     def perform_score_change(self):
         if (
-                self.blue_team.in_geofence_count == 0
-                and self.red_team.in_geofence_count > 0
+            self.blue_team.in_geofence_count == 0
+            and self.red_team.in_geofence_count > 0
         ):
             self.red_team.score += 1
             self.last_in_control = TeamColor.RED
         elif (
-                self.red_team.in_geofence_count == 0
-                and self.blue_team.in_geofence_count > 0
+            self.red_team.in_geofence_count == 0
+            and self.blue_team.in_geofence_count > 0
         ):
             self.blue_team.score += 1
             self.last_in_control = TeamColor.BLUE
         elif (
-                self.red_team.in_geofence_count != 0
-                and self.blue_team.in_geofence_count != 0
+            self.red_team.in_geofence_count != 0
+            and self.blue_team.in_geofence_count != 0
         ):
             self.last_in_control = TeamColor.CONTESTED
         else:
@@ -128,9 +148,9 @@ class Game:
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
         def split_and_add_list_evenly(
-                list1: List[Any], list2: List[Any], list3: List[Any]
+            list1: List[Any], list2: List[Any], list3: List[Any]
         ):
-            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2):]
+            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2) :]
             list1.extend(fh)
             list2.extend(sh)
 
