@@ -36,7 +36,7 @@ def update_score(users_in_geofence: List[Dict[str, Any]]):
             game.duration -= 1
             if game.duration == 0:
                 game.status = Status.FINISH
-    
+
 
 @app.route("/")
 def index():

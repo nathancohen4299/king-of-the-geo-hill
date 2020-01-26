@@ -2,6 +2,7 @@ import requests
 from flask_apscheduler import APScheduler
 from api.app import app, update_score
 
+
 class Config(object):
     JOBS = [
         {
@@ -25,10 +26,6 @@ def get_users_in_geofence():
     app.logger.critical(r.text)
     app.logger.critical(r.json()["users"])
     # update_score(r.json()["users"])
-
-
-
-     
 
 
 if __name__ == "__main__":
