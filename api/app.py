@@ -1,22 +1,46 @@
-from flask import Flask, jsonify, request, abort
-from http import HTTPStatus
-from typing import Dict
-
-from api.objs.game import Game
-from api.objs.team import Team
-from api.objs.team_color import TeamColor
-from api.objs.user import User
-
 import logging
+from http import HTTPStatus
+from typing import Dict, List, Any
+
+from flask import Flask, jsonify, request, abort
+
+from api.objs.game import Game, Status
+from api.objs.team_color import TeamColor
 
 app = Flask(__name__)
 
 games: Dict[str, Game] = {}
 
 
+def update_score(users_in_geofence: List[Dict[str, Any]]):
+    # log users here
+
+    for user in users_in_geofence:
+        game_id = user["metadata"]["game_id"]
+        user_id = user["metadata"]["userId"]
+        if game_id in games:
+            if user_id in games[user_id].usernames:
+                if games[user_id].usernames[user_id] == TeamColor.RED:
+                    games[user_id].red_team.in_geofence_count += 1
+                elif games[user_id].usernames[user_id] == TeamColor.BLUE:
+                    games[user_id].blue_team.in_geofence_count += 1
+
+    for game in games.values():
+        if game.status == Status.ACTIVE:
+            scorer: TeamColor = game.perform_score_change()
+
+            # reset geofence counts
+            game.blue_team.in_geofence_count = 0
+            game.red_team.in_geofence_count = 0
+
+            game.duration -= 1
+            if game.duration == 0:
+                game.status = Status.FINISH
+    
+
 @app.route("/")
 def index():
-    return jsonify(HTTPStatus.OK)
+    return jsonify(success=True)
 
 
 @app.route("/game/<game_id>/user/<user_id>", methods=["POST", "GET", "PUT"])
@@ -45,11 +69,11 @@ def user_route(game_id: str, user_id: str):
             logging.error("game_id: {} Not Found. Returned 404".format(game_id))
             abort(HTTPStatus.NOT_FOUND, "game_id")
 
-        if user_id not in games[game_id].user_names:
+        if user_id not in games[game_id].usernames:
             logging.error("user_id: {} Not Found. Returned 404".format(user_id))
             abort(HTTPStatus.NOT_FOUND, "user_id")
 
-        return jsonify(games[game_id].user_names[user_id].value)
+        return jsonify(games[game_id].usernames[user_id].value)
     elif request.method == "PUT":
         team_color_str = json["team_color"].upper()
 
@@ -58,7 +82,7 @@ def user_route(game_id: str, user_id: str):
         if game_id not in games:
             abort(HTTPStatus.NOT_FOUND, "Game ID")
 
-        if user_id not in games[game_id].user_names:
+        if user_id not in games[game_id].usernames:
             abort(HTTPStatus.NOT_FOUND, "User")
 
         if not games[game_id].set_user(user_id, team):

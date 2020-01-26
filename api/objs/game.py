@@ -19,13 +19,14 @@ class Game:
     def __init__(self, name: str, duration: float):
         self.id: str = name
         self.duration: float = duration
+        self.time_limit: float = duration
         self.potential_blue_team_count: int = 0
         self.potential_red_team_count: int = 0
         self.potential_auto_assign_count: int = 0
         self.blue_team: Team = Team()
         self.red_team: Team = Team()
         self.status: Status = Status.START
-        self.user_names: Dict[str, TeamColor] = {}
+        self.usernames: Dict[str, TeamColor] = {}
 
     def to_dict(self):
         return {
@@ -40,7 +41,7 @@ class Game:
     def start_game(self):
         # initialize teams here
         red_team, blue_team, auto_assign = [], [], []
-        for user_name, team in self.user_names.items():
+        for user_name, team in self.usernames.items():
             if team == TeamColor.RED:
                 red_team.append(user_name)
             elif team == TeamColor.BLUE:
@@ -61,10 +62,10 @@ class Game:
 
     def add_user(self, user_name: str, team: TeamColor):
         u = User(user_name)
-        if u.user_name in self.user_names:
+        if u.user_name in self.usernames:
             return False
 
-        self.user_names[u.user_name] = team
+        self.usernames[u.user_name] = team
         if team == TeamColor.RED:
             self.potential_blue_team_count += 1
         elif team == TeamColor.BLUE:
@@ -75,10 +76,10 @@ class Game:
         return True
 
     def set_user(self, user_name: str, new_team: TeamColor):
-        if user_name not in self.user_names:
+        if user_name not in self.usernames:
             return False
 
-        old_team = self.user_names[user_name]
+        old_team = self.usernames[user_name]
 
         if old_team == TeamColor.BLUE:
             self.potential_blue_team_count -= 1
@@ -87,7 +88,7 @@ class Game:
         elif old_team == TeamColor.AUTO:
             self.potential_auto_assign_count -= 1
 
-        self.user_names[user_name] = new_team
+        self.usernames[user_name] = new_team
 
         if new_team == TeamColor.BLUE:
             self.potential_blue_team_count += 1
@@ -98,12 +99,29 @@ class Game:
 
         return True
 
+    def update_username_map(self):
+        """ Updates username map to match red and blue team lists
+
+        """
+        for user in self.blue_team.users:
+            self.usernames[user.user_name] = TeamColor.BLUE
+        for user in self.red_team.users:
+            self.usernames[user.user_name] = TeamColor.RED
+
+    def perform_score_change(self):
+        if self.blue_team.in_geofence_count == 0 and self.red_team.in_geofence_count > 0:
+            self.red_team.score += 1
+            return TeamColor.RED
+        elif self.red_team.in_geofence_count == 0 and self.blue_team.in_geofence_count > 0:
+            self.blue_team.score += 1
+            return TeamColor.BLUE
+
     @staticmethod
     def balance_teams(team1: List[Any], team2: List[Any], auto: List[Any]):
         def split_and_add_list_evenly(
-            list1: List[Any], list2: List[Any], list3: List[Any]
+                list1: List[Any], list2: List[Any], list3: List[Any]
         ):
-            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2) :]
+            fh, sh = list3[: (len(list3) // 2)], list3[(len(list3) // 2):]
             list1.extend(fh)
             list2.extend(sh)
 
