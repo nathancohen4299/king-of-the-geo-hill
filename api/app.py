@@ -17,6 +17,30 @@ def index():
     return jsonify(HTTPStatus.OK)
 
 
+@app.route("/game", methods=["POST"])
+def game_route():
+    json = request.get_json()
+    user_id = json["user_id"]
+    if request.method == "POST":
+        game = Game(json["game_id"], json["duration"])
+        if game.id in games:
+            abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")
+        else:
+            games[game.id] = game
+            games[game.id].add_user(user_id)
+        return jsonify(game.to_dict())
+    abort(HTTPStatus.BAD_REQUEST)
+
+
+@app.route("/game/<game_id>", methods=["GET"])
+def game_get_route(game_id: str):
+    if request.method == "GET":
+        if game_id in games:
+            return jsonify(games[game_id].to_dict())
+        else:
+            abort(HTTPStatus.NOT_FOUND)
+
+
 @app.route("/game/<game_id>/<user_id>", methods=["POST", "GET", "PUT"])
 def user_route(game_id: str, user_id: str):
     json = request.get_json()
@@ -60,28 +84,6 @@ def user_route(game_id: str, user_id: str):
         games[game_id].set_user(user_id, team)
 
     abort(HTTPStatus.BAD_REQUEST)
-
-
-@app.route("/game", methods=["POST"])
-def game_route():
-    json = request.get_json()
-    if request.method == "POST":
-        game = Game(json["game_id"], json["duration"])
-        if game.id in games:
-            abort(HTTPStatus.CONFLICT, "A Game with that ID already exists")
-        else:
-            games[game.id] = game
-        return jsonify(game.to_dict())
-    abort(HTTPStatus.BAD_REQUEST)
-
-
-@app.route("/game/<game_id>", methods=["GET"])
-def game_get_route(game_id: str):
-    if request.method == "GET":
-        if game_id in games:
-            return jsonify(games[game_id].to_dict())
-        else:
-            abort(HTTPStatus.NOT_FOUND)
 
 
 @app.route("/team/<game_id>", methods=["GET"])
