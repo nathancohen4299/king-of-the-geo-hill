@@ -1,3 +1,5 @@
 pytest
 flask
 requests
+flask_apscheduler
+wheel
