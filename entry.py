@@ -1,7 +1,6 @@
-
+import requests
 from flask_apscheduler import APScheduler
 from api.app import app
-
 
 class Config(object):
     JOBS = [
@@ -10,7 +9,7 @@ class Config(object):
             'func': 'entry:job1',
             'args': (1, 2),
             'trigger': 'interval',
-            'seconds': 10
+            'seconds': 1
         }
     ]
 
@@ -18,7 +17,9 @@ class Config(object):
 
 
 def job1(a, b):
-    print(str(a) + ' ' + str(b))
+    headers = {'Authorization': 'prj_test_sk_593c83bc7be1078df3fd09f125eb776f96906dee'}
+    r = requests.get("https://api.radar.io/v1/geofences/5e2c9c6e5f526200f02d9cb4/users", headers=headers)
+    app.logger.critical(r.text)
 
 
 
